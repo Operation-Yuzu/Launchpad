@@ -2,7 +2,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import express from 'express';
 
-import test from './router.js';
+// import test from './router.js';
 
 const app = express();
 const port = 8000;
