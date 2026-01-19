@@ -5,8 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
-    "build:server": "tsc -b ./server/",
+    "build": "tsc -b ./server/",
     "lint": "eslint .",
     "preview": "vite preview",
     "start": "node tsout-server/server/index.js"
