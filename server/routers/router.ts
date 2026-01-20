@@ -22,7 +22,7 @@ router.post('/user', (req, res) => {
       console.log("Created user... hopefully");
       res.sendStatus(201);
     })
-    .catch((error) => {
+    .catch((error: object) => {
       console.error("Failed to create user:", error);
       res.sendStatus(500);
     })
