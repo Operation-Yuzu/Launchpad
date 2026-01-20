@@ -1,20 +1,10 @@
 {
   "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "node",
     "target": "ES2023",
-    "lib": ["ES2023"],
-    "module": "NodeNext",
-    "types": ["node"],
-    "skipLibCheck": true,
-    "outDir": "../tsout-server",
-
-    /* Linting */
     "strict": true,
-    // "noUnusedLocals": true,
-    // "noUnusedParameters": true,
-    // "erasableSyntaxOnly": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true,
-    // "allowImportingTsExtensions": true
-  },
-  "include": ["*.ts"]
+    "esModuleInterop": true,
+    "ignoreDeprecations": "6.0"
+  }
 }
