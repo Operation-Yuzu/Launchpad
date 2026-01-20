@@ -1,0 +1,8 @@
+steps:
+  # Step 1: Run Prisma Migrations
+  - name: 'node:20' # or your preferred node version
+    entrypoint: npx
+  #  env: TODO - figure out how to go about cloud storage
+    #  - 'DATABASE_URL=${_DATABASE_URL}'
+    args: ['prisma', 'migrate', 'deploy']
+
