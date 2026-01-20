@@ -3,9 +3,8 @@ import { dirname, join } from 'node:path';
 import express from 'express';
 
 import router from './routers/router.js';
-// import test from './database/script.js';
 
-// AUTH
+// * AUTH
 import session from 'express-session';
 import passport from 'passport';
 import authRouter from './routers/auth.js'
@@ -18,7 +17,7 @@ const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({ adapter });
 
 const app = express();
-/* 
+/*
 Helpful Vocabulary:
 
 Cloud Run - a deployment service provided by Google Cloud platform that handles automatic scaling without infrastructure management.
@@ -50,12 +49,12 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 app.use(express.json());
 app.use(express.static(join(__dirname, '..', 'dist')));
 
-// AUTH
+// * AUTH STUFF FROM HERE ON
 app.use(session({
-  secret: 'temp test',
+  secret: 'temp test', // TODO: Change this later.
   resave: false,
   saveUninitialized: false,
-  store: new PrismaSessionStore(prisma, { //WIP
+  store: new PrismaSessionStore(prisma, {
     checkPeriod: 2 * 60 * 1000, // milliseconds roughly equal to 2 minutes?
     dbRecordIdIsSessionId: true,
     dbRecordIdFunction: undefined

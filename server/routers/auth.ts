@@ -1,6 +1,7 @@
 import express from 'express';
 import passport from 'passport';
-import GoogleStrategy from 'passport-google-oidc';
+import GoogleStrategy from 'passport-google-oidc'; // TODO: Fix this TS error. I have no clue how.
+import { User } from '../../generated/prisma/client.js' // * 'User' Type.
 import { prisma } from '../database/prisma.js';
 
 const router = express.Router();
@@ -10,38 +11,26 @@ passport.use(new GoogleStrategy({
   clientSecret: process.env['GOOGLE_CLIENT_SECRET'],
   callbackURL: '/oauth2/redirect/google',
   scope: [ 'profile' ]
-}, function verify (issuer, profile, cb) {
-  prisma.user.findOne({
+}, function verify (issuer : string, profile : {id: number, displayName: string}, cb : Function) {
+  prisma.user.findFirst({
     where: {
-      provider: issuer,
-      subject: profile.id
+      credentialProvider: issuer,
+      credentialSubject: profile.id
     }
   }).then((user) => {
     if (!user) {
       return prisma.user.create({
         data: {
-          name: profile.displayName
+          name: profile.displayName,
+          credentialProvider: issuer,
+          credentialSubject: profile.id
         }
-      }).then(() => {
-        // the same as below, just needs to run in order.
+      }).then((newUser) => {
+        return cb(null, newUser);
       })
-    }
-
-    const id = this.lastID;
-    return prisma.federated_credentials.create({
-      data: {
-        user_id: id,
-        provider: issuer,
-        subject: profile.id
-      }
-    }).then(() => {
-      const user = {
-        id: id,
-        name: profile.displayName
-      }
+    } else {
       return cb(null, user);
-    })
-
+    }
   }).catch((err) => {
     cb(err);
   })
@@ -49,13 +38,14 @@ passport.use(new GoogleStrategy({
 
 router.get('/login', function (req, res, next) {
   // res.render('login'); need a login page to make it work
+  // TODO: Get this rout to go somewhere, or just remove it altogether and keep the button on the page.
 });
 
 router.get('/login/federated/google', passport.authenticate('google'));
 
 router.get('/oauth2/redirect/google', passport.authenticate('google', {
   successRedirect: '/',
-  failureRedirect: '/login'
+  failureRedirect: '/login' //TODO: Decide what to do here.
 }));
 
 router.post('/logout', function(req, res, next) {
@@ -65,13 +55,13 @@ router.post('/logout', function(req, res, next) {
   });
 });
 
-passport.serializeUser(function(user, cb) {
+passport.serializeUser(function(user : User, cb) { //TODO: Fix this TS error.
   process.nextTick(function() {
-    cb(null, { id: user.id, username: user.username, name: user.name });
+    cb(null, { id: user.id, name: user.name });
   });
 });
 
-passport.deserializeUser(function(user, cb) {
+passport.deserializeUser(function(user : User, cb) {
   process.nextTick(function() {
     return cb(null, user);
   });
