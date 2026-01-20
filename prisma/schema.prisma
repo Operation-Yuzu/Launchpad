@@ -26,6 +26,8 @@ model Dashboard {
   name       String
   owner      User    @relation("UserDashboards", fields: [ownerId], references: [id])
   ownerId    Int
+  theme      Theme @relation(fields: [themeId], references: [id])
+  themeId    Int @unique
   primaryOf  User?  @relation("PrimaryDash")
 }
 
@@ -34,4 +36,13 @@ model Session {
   sid       String   @unique
   data      String   @db.MediumText  // MediumText may be needed for MySql
   expiresAt   DateTime
+}
+
+model Theme {
+  id        Int     @id @default(autoincrement())
+  usedBy    Dashboard?
+  public    Boolean
+  navColor  String
+  bgColor   String
+  font      String
 }
