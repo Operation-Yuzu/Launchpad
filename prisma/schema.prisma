@@ -18,6 +18,8 @@ model User {
   primaryDashId      Int?        @unique
   credentialProvider String
   credentialSubject  Int
+  themes             Theme[]
+  layouts            Layout[]
 }
 
 model Dashboard {
@@ -28,25 +30,33 @@ model Dashboard {
   theme     Theme  @relation(fields: [themeId], references: [id])
   themeId   Int    @unique
   layout    Layout @relation(fields: [layoutId], references: [id])
-  layoutId  Int
+  layoutId  Int    @unique
   primaryOf User?  @relation("PrimaryDash")
 }
 
 model Theme {
-  id       Int        @id @default(autoincrement())
-  usedBy   Dashboard?
-  public   Boolean
+  id     Int        @id @default(autoincrement())
+  usedBy Dashboard?
+
+  owner   User @relation(fields: [ownerId], references: [id])
+  ownerId Int
+
+  public   Boolean @default(false)
   navColor String
   bgColor  String
   font     String
 }
 
 model Layout {
-  id     Int     @id @default(autoincrement())
-  public Boolean
+  id     Int        @id @default(autoincrement())
+  usedBy Dashboard?
+
+  owner   User @relation(fields: [ownerId], references: [id])
+  ownerId Int
+
+  public Boolean @default(false)
 
   gridSize       String
-  dashboards     Dashboard[]
   layoutElements LayoutElement[]
 }
 
@@ -63,8 +73,7 @@ model LayoutElement {
 }
 
 model Widget {
-  id   Int    @id @default(autoincrement())
-  name String
-
+  id             Int             @id @default(autoincrement())
+  name           String
   layoutElements LayoutElement[]
 }
