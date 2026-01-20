@@ -7,6 +7,54 @@ const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
+  await prisma.user.create({
+    data: {
+      name: 'Demo Account',
+      credentialProvider: 'None',
+      credentialSubject: 0
+    }
+  });
+
+  await prisma.widget.createMany({
+    data: [
+      { name: 'Calendar' },
+      { name: 'Email' }
+    ]
+  });
+
+  await prisma.layout.createMany({
+    data: [
+      { public: true, gridSize: 'medium' },
+      { public: true, gridSize: 'medium' },
+      { public: true, gridSize: 'medium' },
+      { public: true, gridSize: 'medium' }
+    ]
+  });
+
+  await prisma.layoutelement.createMany({
+    data: [
+      { layoutId: 1, widgetId: 1, posX: 1, posY: 1, sizeX: 1, sizeY: 1 },
+      { layoutId: 1, widgetId: 2, posX: 5, posY: 1, sizeX: 1, sizeY: 1 },
+      { layoutId: 2, widgetId: 1, posX: 5, posY: 1, sizeX: 1, sizeY: 1 },
+      { layoutId: 2, widgetId: 2, posX: 1, posY: 1, sizeX: 1, sizeY: 1 },
+      { layoutId: 3, widgetId: 1, posX: 1, posY: 1, sizeX: 1, sizeY: 1 },
+    ]
+  });
+
+  await prisma.theme.createMany({
+    data: [
+      { public: true, navColor: '#0000FF', bgColor: '#00FFFF', font: "Constantia" },
+      { public: true, navColor: '#FF0000', bgColor: '#FF00FF', font: "Constantia" },
+      { public: true, navColor: '#00FF00', bgColor: '#FFFF00', font: "Constantia" }
+    ]
+  });
+
+  await prisma.dashboard.createMany({
+    data: [
+      { name: 'blue+cyan', ownerId: 1, themeId: 1, layoutId: 1 },
+      { name: 'red+magenta', ownerId: 1, themeId: 2, layoutId: 2 }
+    ]
+  });
 
 }
 
