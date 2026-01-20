@@ -1,0 +1,41 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                  Int     @id @default(autoincrement())
+  name                String?
+  dashboards          Dashboard[] @relation("UserDashboards")
+  primaryDash         Dashboard? @relation("PrimaryDash", fields: [primaryDashId], references: [id])
+  primaryDashId       Int? @unique
+  credentialProvider  String
+  credentialSubject   Int
+}
+
+model Dashboard {
+  id         Int     @id @default(autoincrement())
+  name       String
+  owner      User    @relation("UserDashboards", fields: [ownerId], references: [id])
+  ownerId    Int
+  theme      Theme @relation(fields: [themeId], references: [id])
+  themeId    Int @unique
+  primaryOf  User?  @relation("PrimaryDash")
+}
+
+model Theme {
+  id        Int     @id @default(autoincrement())
+  usedBy    Dashboard?
+  public    Boolean
+  navColor  String
+  bgColor   String
+  font      String
+}
