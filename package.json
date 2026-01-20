@@ -10,7 +10,8 @@
     "build:server": "tsc -b ./server/",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "node tsout-server/server/index.js"
+    "start": "node tsout-server/server/index.js",
+    "postinstall": "npx prisma generate"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.2.0",
