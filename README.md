@@ -5,32 +5,38 @@
 
 ### Prisma Setup (first time)
 
-1. npm install
+1. `npm install`
 
-2. Create or update .env file with the correct DATABASE_URL of the form:
-DATABASE_URL="postgresql://username:password@localhost:5432/mydb?schema=public"
+2. Create or update .env file with the correct `DATABASE_URL` of the form:
+`DATABASE_URL="postgresql://username:password@localhost:5432/mydb?schema=public"`
+
+    Things to change:
+
+    * `username` to your username
+    * `password` to your password
+    * We are using port `5432` for now, but that could change in the future
+    * `mydb` to `launchpad`
 
 3. `npx prisma migrate dev --name init`
 
 4. `npx prisma generate`
 
+5. `npx prisma db seed`
+
 ### Prisma Setup (migrating schema)
 
 (Still in progress - may be inaccurate)
 
-1. `npx prisma migrate dev`
+1. Migrate your database. Options:
 
-  You may need to run `npx prisma migrate reset` first to drop and reinitialize the tables. WARNING: ALL DATA WILL BE LOST
+    1. `npx prisma migrate reset`
 
-  -> Aside: if you need to quickly drop tables to perform the migration, you can log into the psql shell and run:
+        WARNING: ALL DATA WILL BE LOST! This drops everything to start from a clean slate. It's fine if none of the data in your database matters much. In this case, perform the seed step (step 3) to get up and running again quickly.
 
-  ```
-  \c launchpad
-  DROP TABLE "table";
-  ```
+    2. `npx prisma migrate dev`
 
-  (The quotes are necessary to ensure the case sensitivity works.)
-
-  WARNING: this destroys ALL data in the dropped tables!
+        I think this is the way to maintain your data and update it to conform with the new schemas. I don't know how to do it yet, which is why I've only been using the reset option.
 
 2. `npx prisma generate`
+
+3. `npx prisma db seed` if the database was reset
