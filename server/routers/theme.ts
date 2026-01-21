@@ -16,7 +16,7 @@ theme.post('/', async (req, res) => {
   // need to insert information
   // console.log(req)
   const { public: isPublic, navColor, bgColor, font, ownerId} = req.body as {public: boolean, navColor: string, bgColor: string, font: string, ownerId: number}
-
+  console.log(ownerId, 'HELLLOOOOOO');
   try {
     await prisma.theme.create({
       data: {
