@@ -43,6 +43,33 @@ theme.post('/', async (req, res) => {
 
 // PUT/PATCH - This will be if a user clicks on a dashboard and starts the change the colors - name
 // update the dashboard colors
-// update the dashboard name
+// have to get the id of the theme
+theme.patch('/', async (req, res) => {
+  // need to insert information
+  // console.log(req)
+  const { public: isPublic, navColor, bgColor, font, ownerId} = req.body as {public: boolean, navColor: string, bgColor: string, font: string, ownerId: number}
+  const {id} = req.body;
+  console.log(ownerId, 'HELLLOOOOOO');
+  try {
+    await prisma.theme.update({
+      where: {
+        id: id
+      },
+      data: {
+      public: isPublic,
+      navColor,
+      bgColor,
+      font,
+      ownerId: ownerId
+      }
+    })
+  } catch (error) {
+    console.error('You already updated this theme', error);
+    res.sendStatus(500);
+  }
+
+})
+
+
 
 export default theme;
