@@ -20,6 +20,8 @@ function App() {
         editing ? <DashEditor dashboardId={dashboardId} toggleEditing={toggleEditing}/>
           : <Dashboard dashboardId={dashboardId} toggleEditing={toggleEditing}/>
       }
+      <h1>Sign in</h1>
+      <a className="button google" href="/login/federated/google">Sign in with Google</a>
     </>
   );
 }

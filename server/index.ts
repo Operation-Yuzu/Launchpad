@@ -54,7 +54,7 @@ app.use(express.static(join(__dirname, '..', '..','dist'))); // evidently this i
 // * AUTH STUFF FROM HERE ON
 app.use(session({
   secret: 'temp test', // TODO: Change this later.
-  resave: false,
+  resave: true,
   saveUninitialized: false,
   store: new PrismaSessionStore(prisma, {
     checkPeriod: 2 * 60 * 1000, // milliseconds roughly equal to 2 minutes?
