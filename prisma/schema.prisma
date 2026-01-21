@@ -36,7 +36,7 @@ model Dashboard {
 
 model Theme {
   id     Int        @id @default(autoincrement())
-  dashboard Dashboard?
+  usedBy Dashboard?
 
   owner   User @relation(fields: [ownerId], references: [id])
   ownerId Int

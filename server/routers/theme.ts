@@ -24,9 +24,10 @@ theme.post('/', async (req, res) => {
       navColor,
       bgColor,
       font,
-      ownerId
+      ownerId: ownerId
       }
     })
+    res.sendStatus(201);
   } catch (error) {
     console.error('You already have this theme', error);
     res.sendStatus(500);
