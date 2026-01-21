@@ -1,7 +1,8 @@
 import { useState, useEffect, type ChangeEvent } from 'react';
+import { Link } from "react-router";
 import axios from 'axios';
 
-function DashEditor({dashboardId, toggleEditing}: {dashboardId: number, toggleEditing: () => void}) {
+function DashEditor({dashboardId}: {dashboardId: number}) {
   const [dashboard, setDashboard] = useState({name: "Loading"});
   const [newName, setNewName] = useState('');
   const [renaming, setRenaming] = useState(false);
@@ -65,7 +66,7 @@ function DashEditor({dashboardId, toggleEditing}: {dashboardId: number, toggleEd
   return (
     <>
       <h2>Editing: {renderName()}</h2>
-      <button onClick={toggleEditing}>Done</button>
+      <Link to='/'>Done</Link>
     </>
   );
 }

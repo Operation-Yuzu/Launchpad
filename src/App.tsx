@@ -1,26 +1,23 @@
-import { useState } from 'react';
+// import { useState } from 'react';
+import { BrowserRouter, Routes, Route } from "react-router";
 
 import Dashboard from './Dashboard';
 import DashEditor from './DashEditor';
 
 function App() {
-  const [editing, setEditing] = useState(false);
-
-  const toggleEditing = () => {
-    setEditing((e: boolean) => !e);
-  }
-
-  const dashboardId = 1; // hardcoded for now
+  const activeDash = 1; // hardcoded for now
+  // eventually want something like:
+  // const [activeDash, setActiveDash] = useState(null)
+  // what happens if the user doesn't have any dashboards?
 
 
   return (
-    <>
-      <h1>Rendering</h1>
-      {
-        editing ? <DashEditor dashboardId={dashboardId} toggleEditing={toggleEditing}/>
-          : <Dashboard dashboardId={dashboardId} toggleEditing={toggleEditing}/>
-      }
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path='/' element={<Dashboard dashboardId={activeDash}/>} />
+        <Route path='/edit' element={<DashEditor dashboardId={activeDash}/>} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
