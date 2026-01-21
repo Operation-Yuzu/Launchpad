@@ -1,39 +1,27 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+
+import Dashboard from './Dashboard';
+import DashEditor from './DashEditor';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [editing, setEditing] = useState(false);
+
+  const toggleEditing = () => {
+    setEditing((e: boolean) => !e);
+  }
+
+  const dashboardId = 1; // hardcoded for now
+
 
   return (
     <>
-      {/* TESTING AUTH*/}
-      <h1>Sign in</h1>
-      <a className="button google" href="/login/federated/google">Sign in with Google</a>
-      {/* TESTING AUTH*/}
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <h1>Rendering</h1>
+      {
+        editing ? <DashEditor dashboardId={dashboardId} toggleEditing={toggleEditing}/>
+          : <Dashboard dashboardId={dashboardId} toggleEditing={toggleEditing}/>
+      }
     </>
-  )
+  );
 }
 
-export default App
+export default App;
