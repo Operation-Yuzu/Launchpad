@@ -19,24 +19,5 @@ user.get('/', (req : any, res) => {
   }
 });
 
-user.post('/create', async (req, res) => {
-  const { name }: { name: string} = req.body;
-
-  try {
-    await prisma.user.create({
-      data: {
-        name,
-        credentialProvider: "",
-        credentialSubject: 0
-      }
-    });
-
-    console.log("Created user... hopefully");
-    res.sendStatus(201);
-  } catch (error) {
-    console.error("Failed to create user:", error);
-    res.sendStatus(500);
-  }
-});
 
 export default user;
