@@ -11,15 +11,13 @@
 
 
 import { useState, useEffect} from 'react';
-// import { Link } from "react-router";
+
 import axios from 'axios';
+import { Button, HStack } from '@chakra-ui/react'
 
 function Theme ({dashboard}: {dashboard: { name: string, ownerId: number}}) {
   const [themesList, setThemesList] = useState([] as {navColor: string, bgColor: string, font: string}[]);
-  // react hook needs to set theme
-  //const [ownerId, setOwnerId] = useState({ownerId: -1});
-  console.log(dashboard, 'THIS IS THE DASH OBJECT')
-  console.log(themesList, 'CAN YOU SEE THISSSSSS')
+  
   // first lets get all the themes of that user
   const allThemes = async () => {
     const ownerId  = dashboard.ownerId;
@@ -32,6 +30,24 @@ function Theme ({dashboard}: {dashboard: { name: string, ownerId: number}}) {
     }
   }
   
+
+  // POST to make a new theme
+  // make sure field is completely filled out
+  // const newTheme = async () => {
+  //   const ownerId = dashboard.ownerId; // need to send this in the request as well
+  //   try {
+  //     if({isPublic: boolean, navColor: string, bgColor: string, font: string}, ownerId){
+  //       // so if none of those fields are empty
+  //       await axios.post('/theme', {isPublic, navColor, bgColor, font, ownerId})
+  //     }
+  //   } catch (error) {
+  //     console.error('Failed to submit theme', error);
+  //   }
+  // }
+
+// test
+
+
   useEffect(() => {
     // if the owner is provided
     if(dashboard.ownerId){
@@ -47,6 +63,11 @@ function Theme ({dashboard}: {dashboard: { name: string, ownerId: number}}) {
         return <div>{theme.navColor}{theme.bgColor}{theme.font}</div>
       })
     }
+    <HStack>
+      <Button>
+        Click me
+      </Button>
+    </HStack>
     </>
   )
 }
