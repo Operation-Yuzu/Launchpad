@@ -95,6 +95,8 @@ router.patch('/:id', async (req, res) => {
 // deletes dashboard based on dashboard id
 router.delete('/:id', async (req, res) => {
 
+  // TODO AUTH
+
   const { id: idString } = req.params;
   const id = parseInt(idString);
 

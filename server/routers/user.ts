@@ -4,12 +4,15 @@ import { prisma } from '../database/prisma.js';
 
 const router = express.Router();
 
-router.get('/info', async (req, res) => {
+
+// want to use this to be able to grab user's information for client side
+router.get('/:id', async (req, res) => {
+// TODO AUTH AUTH AUTH
 
     try {
-
-    } catch (error) {
         
+    } catch (error) {
+
     }
 });
 
