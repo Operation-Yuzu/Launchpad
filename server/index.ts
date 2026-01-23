@@ -3,7 +3,8 @@ import { dirname, join } from 'node:path';
 import express from 'express';
 
 import router from './routers/router.js';
-import theme from './routers/theme.js'
+import theme from './routers/theme.js';
+import calendar from './routers/calendar.js';
 import test from './database/script.js';
 
 const app = express();
@@ -41,6 +42,7 @@ app.use(express.static(join(__dirname, '..', '..', 'dist'))); // evidently this 
 
 app.use(router);
 app.use('/theme', theme);
+app.use('/calendar', calendar);
 app.listen(port, host, () => {
   console.info(`Listening on http://localhost:${port}`);
 });
