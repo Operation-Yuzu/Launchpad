@@ -20,7 +20,6 @@ function DashEditor({dashboardId}: {dashboardId: number}) {
     try {
       const response = await axios.get(`/dashboard/${dashboardId}`);
       console.log(response);
-      console.log(response.data);
       setDashboard(response.data);
       setNewName(response.data.name);
     } catch (error) {

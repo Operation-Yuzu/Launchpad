@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from "react-router";
 
 import Dashboard from './Dashboard';
 import DashEditor from './DashEditor';
+import Calendar from './Calendar';
 
 function App() {
   const [userDataMessage, setUserDataMessage] = useState('You have not checked User Data.');
@@ -44,6 +45,7 @@ function App() {
           <Route path='/edit' element={<DashEditor dashboardId={activeDash}/>} />
         </Routes>
       </BrowserRouter>
+      <Calendar />
     </>
   );
 }

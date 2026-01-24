@@ -19,7 +19,7 @@ const prisma = new PrismaClient({ adapter });
 import theme from './routers/theme.js'
 import layout from './routers/layout.js';
 import user from './routers/user.js'
-import test from './database/script.js';
+import calendar from './routers/calendar.js';
 
 const app = express();
 /*
@@ -73,6 +73,7 @@ app.use('/', authRouter);
 
 app.use(router);
 app.use('/theme', theme);
+app.use('/calendar', calendar);
 app.use('/layout', layout);
 app.use('/user', user);
 
