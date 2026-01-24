@@ -27,7 +27,8 @@ model GoogleToken {
   id            Int       @id @default(autoincrement())
   account       User      @relation(fields: [accountId], references: [id])
   accountId     Int
-  token         String
+  access_token  String
+  id_token      String
   authProfile   Boolean   @default(false)
   authGmail     Boolean   @default(false)
   authCalendar  Boolean   @default(false)

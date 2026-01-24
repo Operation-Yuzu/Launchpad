@@ -35,10 +35,6 @@ function Calendar() {
     }
   }
 
-  const handleAuthAttempt = () => {
-    console.log('should try to authorize');
-  };
-
   const getEvents = async () => {
     try {
       const response = await axios.get('/calendar');
@@ -60,7 +56,7 @@ function Calendar() {
         break;
       case AuthStatus.Unauthorized:
         return (
-          <button onClick={handleAuthAttempt}>Authorize Calendar</button>
+          <a href='/auth/calendar'>Authorize Calendar</a>
         )
         break;
       case AuthStatus.Authorized:
