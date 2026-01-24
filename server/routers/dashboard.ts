@@ -1,41 +1,61 @@
 import express from 'express';
+import passport from 'passport'
+
 //import { Prisma } from '@prisma/client';
 import { Prisma } from '../../generated/prisma/client.js'; // not sure about this, although it matches what was in database/prisma
-
 import { prisma } from '../database/prisma.js';
 
 const router = express.Router();
 
-router.get('/', (req, res) => {
-  res.status(200).send("dashboard!");
+// used to grab all of a specific user's dashboards
+router.get('/all/:id', async (req, res) => {
+// TODO AUTH
+  const { id: idString } = req.params;
+  const id = parseInt(idString);
+  
+  try {
+    const user = await prisma.user.findUnique({
+      include: {
+        dashboards: true
+      },
+      where: {
+        id
+      }
+    })
+     
+    const dashboards = user.dashboards
+    res.status(200).send(dashboards)
+  } catch (error) {
+    console.error(error)
+  }
 });
 
-// router.get('/:id', async (req, res) => {
-//   // there should be some sort of auth here to check if the given dashboard
-//   // either belongs to the user or is public
+router.get('/:id', async (req, res) => {
+  // there should be some sort of auth here to check if the given dashboard
+  // either belongs to the user or is public
 
-//   const { id: idString } = req.params;
-//   const id = parseInt(idString);
+  const { id: idString } = req.params;
+  const id = parseInt(idString);
 
-//   try {
-//     const dashboard = await prisma.dashboard.findUnique({
-//       where: {
-//         id
-//       }
-//     });
+  try {
+    const dashboard = await prisma.dashboard.findUnique({
+      where: {
+        id
+      }
+    });
 
-//     // TODO: check whether the given user should have access to this dashboard
+    // TODO: check whether the given user should have access to this dashboard
 
-//     if (!dashboard) { // dashboard is null if not found
-//       res.sendStatus(404);
-//     } else {
-//       res.status(200).send(dashboard);
-//     }
-//   } catch (error) {
-//     console.error('Failed to find dashboard: ', error);
-//     res.sendStatus(500);
-//   }
-// });
+    if (!dashboard) { // dashboard is null if not found
+      res.sendStatus(404);
+    } else {
+      res.status(200).send(dashboard);
+    }
+  } catch (error) {
+    console.error('Failed to find dashboard: ', error);
+    res.sendStatus(500);
+  }
+});
 
 router.post('/', async (req, res) => {
   // TODO: all sorts of auth
@@ -43,15 +63,21 @@ router.post('/', async (req, res) => {
   // the user's identity should be pulled from the session info
   // rather than just being the client saying "trust me bro"
 
-  const { userId: ownerId, name, themeId, layoutId } = req.body;
+  const { ownerId, name, themeId, layoutId } = req.body;
 
   try {
     await prisma.dashboard.create({
       data: {
         name,
-        ownerId,
-        themeId,
-        layoutId
+        owner: {
+          connect: { id: ownerId}
+        },
+        theme: {
+          connect: {id: themeId}
+        },
+        layout: {
+          connect: { id: layoutId}
+        }
       }
     });
 
