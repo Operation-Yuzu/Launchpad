@@ -12,12 +12,12 @@ function NavBar (props: MyProps) {
 
   return (
     <>
-      <Box as="nav" position="fixed" translateY="10%"  w="100%" h="5%" backgroundColor="yellow.fg" z-index="200">
+      <Box as="nav" position="fixed" top="0" left="0" right="0"  w="100%" h="5%" backgroundColor="yellow.fg" z-index={200}>
         <AbsoluteCenter>
           <Heading>LaunchPad</Heading>
         </AbsoluteCenter>
       </Box>
-      <Container mb="5%"></Container>
+      <Box w="100%" h="5%" top="0" left="0" right="0" paddingBottom="5%"></Box>
       <p>test2</p>
     </>
   );
