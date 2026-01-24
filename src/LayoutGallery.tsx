@@ -8,7 +8,7 @@ type Layout = {
   layoutElements: [];
 };
 
-function LayoutGallery() {
+function LayoutGallery({onSelect}: {onSelect: (layoutId: number) => void}) {
   //console.log('LayoutGallery rendered');
   const [layout, setLayout] = useState<Layout[]>([]);
   console.log('layouts state:', layout);
@@ -37,8 +37,9 @@ function LayoutGallery() {
        {layout.map((lay) => (
         <div key={lay.id}>
           <p>LAYOUT #{lay.id}</p>
-          <p>GRID: {lay.gridSize}</p>
-          <p>ELEMENTS: {lay.layoutElements.length}</p>
+          <button onClick={() => onSelect(lay.id)}> SELECT LAYOUT </button>
+          {/* <p>GRID: {lay.gridSize}</p>
+          <p>ELEMENTS: {lay.layoutElements.length}</p> */}
         </div>
 
       ))}

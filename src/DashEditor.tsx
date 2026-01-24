@@ -4,10 +4,17 @@ import axios from 'axios';
 import Theme from './Theme';
 import LayoutGallery from './LayoutGallery';
 
+
 function DashEditor({dashboardId}: {dashboardId: number}) {
   const [dashboard, setDashboard] = useState({name: "Loading", ownerId: -1});
   const [newName, setNewName] = useState('');
   const [renaming, setRenaming] = useState(false);
+  //ts infer selectedLayout as number(-1 = nothing selected)
+  const [selectedLayoutId, setSelectedLayoutId] = useState(-1);
+
+  function updateSelected (param: number){
+    setSelectedLayoutId(param)
+  }
 
   const loadDashboard = async () => {
     try {
@@ -50,6 +57,10 @@ function DashEditor({dashboardId}: {dashboardId: number}) {
     loadDashboard();
   }, []);
 
+  useEffect(() => {
+    console.log('selectedLayoutId:', selectedLayoutId);
+  }, [selectedLayoutId]);
+
   const renderName = () => {
     if (renaming) {
       return (
@@ -71,8 +82,7 @@ function DashEditor({dashboardId}: {dashboardId: number}) {
       <h2>Editing: {renderName()}</h2>
       <Link to='/'>Done</Link>
       <Theme dashboard={dashboard} />
-      <LayoutGallery/>
-      console.log('DashEditor rendered');
+      <LayoutGallery onSelect={updateSelected}/>
 
     </>
   );
