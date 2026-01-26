@@ -18,7 +18,7 @@ router.post('/create', async (req, res) => {
       data: {
         name,
         credentialProvider: "",
-        credentialSubject: 0
+        credentialSubject: ""
       }
     });
 

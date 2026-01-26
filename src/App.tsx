@@ -53,7 +53,7 @@ function App() {
       <a className="button google" href="/login/federated/google">Sign in with Google</a>
       <button className="logout button google" onClick={() => {handleLogOut()}}>Log Out</button>
       <button className="testGetUserData" onClick={() => {getUserData()}}>Get User Data</button>
-      <p>{userDataMessage.name}</p>
+      <p>{userDataMessage}</p>
       <BrowserRouter>
         <Routes>
           <Route path='/' element={<Dashboard dashboardId={activeDash}/>} />

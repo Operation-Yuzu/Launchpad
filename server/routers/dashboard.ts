@@ -22,6 +22,11 @@ router.get('/all/:id', async (req, res) => {
         id
       }
     })
+
+    if (user === null) {
+      res.sendStatus(404);
+      return;
+    }
      
     const dashboards = user.dashboards
     res.status(200).send(dashboards)
