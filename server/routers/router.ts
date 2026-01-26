@@ -3,12 +3,14 @@ import express from 'express';
 import { prisma } from '../database/prisma.js';
 
 import dashboardRouter from './dashboard.js';
+import userRouter from './user.js'
 
 const router = express.Router();
 
+router.use('/user', userRouter);
 router.use('/dashboard', dashboardRouter);
 
-router.post('/user', async (req, res) => {
+router.post('/create', async (req, res) => {
   const { name }: { name: string} = req.body;
 
   try {
@@ -16,7 +18,7 @@ router.post('/user', async (req, res) => {
       data: {
         name,
         credentialProvider: "",
-        credentialSubject: ""
+        credentialSubject: 0
       }
     });
 
