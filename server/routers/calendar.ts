@@ -14,7 +14,7 @@ async function getDummyData() {
   return JSON.parse(dummyJson);
 }
 
-async function getLiveData(userId: number) {
+async function getCalendarClient(userId: number) {
   const oauth2Client = new google.auth.OAuth2(
     process.env['GOOGLE_CLIENT_ID'],
     process.env['GOOGLE_CLIENT_SECRET'],
@@ -37,15 +37,15 @@ async function getLiveData(userId: number) {
 
   // return null;
 
-  const calendar = google.calendar({version: 'v3', auth: oauth2Client});
+  return google.calendar({version: 'v3', auth: oauth2Client});
 
-  return await calendar.events.list({
-    calendarId: 'primary',
-    timeMin: new Date().toISOString(),
-    maxResults: 10,
-    singleEvents: true,
-    orderBy: 'startTime'
-  });
+  // return await calendar.events.list({
+  //   calendarId: 'primary',
+  //   timeMin: new Date().toISOString(),
+  //   maxResults: 10,
+  //   singleEvents: true,
+  //   orderBy: 'startTime'
+  // });
 }
 
 // TODO: figure out the request.User type
@@ -54,7 +54,22 @@ router.get('/', async (req: any, res) => {
 
   try {
     // const response = await getDummyData();
-    const response = await getLiveData(userId);
+    // const response = await getLiveData(userId);
+
+    const calendar = await getCalendarClient(userId);
+
+    if (calendar === null) { // because no token for this user
+      res.sendStatus(401);
+      return;
+    }
+
+    const response = await calendar.events.list({
+      calendarId: 'primary',
+      timeMin: new Date().toISOString(),
+      maxResults: 10,
+      singleEvents: true,
+      orderBy: 'startTime'
+    });
 
     // res.sendStatus(500);
     // return;
@@ -85,6 +100,14 @@ router.get('/', async (req: any, res) => {
     console.error('Failed to get calendar data:', error);
     res.sendStatus(500);
   }
+});
+
+router.get('/listcalendars', (req, res) => {
+  res.sendStatus(501);
+});
+
+router.get('/next', (req, res) => {
+  res.sendStatus(501);
 });
 
 // todo: fix any
