@@ -42,7 +42,7 @@ passport.use(new GoogleStrategy({
 router.get('/login/federated/google', passport.authenticate('google'));
 
 router.get('/oauth2/redirect/google', passport.authenticate('google', {
-  successRedirect: '/',
+  successRedirect: '/hub',
   failureRedirect: '/'
 }));
 
