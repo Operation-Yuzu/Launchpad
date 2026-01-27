@@ -4,7 +4,7 @@ import { google } from 'googleapis';
 
 import { prisma } from '../database/prisma.js';
 
-import type { Event } from '../../types/Event.ts';
+import type { Event } from '../../types/Calendar.js';
 
 const router = express.Router();
 
@@ -52,6 +52,8 @@ async function getGoogleOauth(userId: number) {
 
 // TODO: figure out the request.User type
 router.get('/', async (req: any, res) => {
+  console.log(req.query);
+
   const userId = req.user?.id;
 
   try {
@@ -106,8 +108,33 @@ router.get('/', async (req: any, res) => {
   }
 });
 
-router.get('/listcalendars', (req, res) => {
-  res.sendStatus(501);
+router.get('/list', async (req: any, res) => {
+  const userId = req.user?.id;
+
+  try {
+    const oauth2Client = await getGoogleOauth(userId);
+
+    if (oauth2Client === null) { // because no token for this user
+      res.sendStatus(401);
+      return;
+    }
+
+    const calendar = google.calendar({version: 'v3', auth: oauth2Client});
+
+    const result = await calendar.calendarList.list();
+
+    const items = result?.data?.items;
+
+    if (items === undefined) {
+      res.sendStatus(500);
+      return;
+    } else {
+      res.status(200).send(items);
+    }
+  } catch (error) {
+    console.error('Failed to get calendar list:', error);
+    res.sendStatus(500);
+  }
 });
 
 router.get('/next', (req, res) => {
