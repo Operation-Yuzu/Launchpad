@@ -13,6 +13,7 @@ dist-ssr
 tsout-server
 *.local
 .env
+data/dummydata.json
 
 # Editor directories and files
 .vscode/*

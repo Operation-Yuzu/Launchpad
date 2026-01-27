@@ -1,16 +1,28 @@
+import { useState } from "react";
+import axios from "axios";
 // import { useState } from 'react';
 // import axios from 'axios';
 import { BrowserRouter, Routes, Route } from "react-router";
 
+import Hub from "./Hub";
 import Dashboard from './Dashboard';
 import DashEditor from './DashEditor';
 import Home from './Home';
 
-function App() {
-  // * Move Auth Stuff to 'Home', probably.
-  // const [userDataMessage, setUserDataMessage] = useState('You have not checked User Data.');
+import Calendar from './Calendar';
 
-  // ? Is this still needed?
+function App() {
+  const [userId, setUserId] = useState(-1);
+  const [userDataMessage, setUserDataMessage] = useState({
+    name: "You have not checked User Data.",
+  });
+  const [user, setUser] = useState({
+    id: null,
+    name: "",
+    credentialProvider: "",
+    credentialSubject: null,
+    primaryDashId: null,
+  });
   const activeDash = 1; // hardcoded for now
   // eventually want something like:
   // const [activeDash, setActiveDash] = useState(null)
@@ -32,6 +44,31 @@ function App() {
   //     console.error("There was a problem while getting user data", err);
   //   })
   // }
+  const handleLogOut = () => {
+    axios
+      .post("/logout")
+      .then((/* Response */) => {
+        // We don't need to do anything with this yet.
+      })
+      .catch((err) => {
+        console.error("There was a problem while logging out", err);
+      });
+  };
+
+  const getUserData = () => {
+    axios.get('/user').then((res) => {
+      if (res.data.id) { // not sure about this
+        setUserDataMessage(res.data);
+        console.log(res.data.id)
+        setUserId(res.data.id)
+      } else {
+        setUserDataMessage({name: 'Not logged in.'});
+        setUserId(-1);
+      }
+    }).catch((err) => {
+      console.error("There was a problem while getting user data", err);
+    })
+  }
 
   return (
     <>
@@ -43,12 +80,15 @@ function App() {
       <button className="testGetUserData" onClick={() => {getUserData()}}>Get User Data</button>
       <p>{userDataMessage}</p> */}
       <Home />
+      <p>{userDataMessage.name}</p>
       <BrowserRouter>
         <Routes>
           <Route path='/' element={<Dashboard dashboardId={activeDash}/>} />
-          <Route path='/edit' element={<DashEditor dashboardId={activeDash}/>} />
+          <Route path='/edit' element={<DashEditor dashboardId={activeDash} ownerId={userId} />} />
+          <Route path="/hub" element={<Hub />} />
         </Routes>
-      </BrowserRouter>
+        </BrowserRouter>
+      <Calendar />
     </>
   );
 }

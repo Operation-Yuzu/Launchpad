@@ -2,17 +2,26 @@ import { useState, useEffect, type ChangeEvent } from 'react';
 import { Link } from "react-router";
 import axios from 'axios';
 import Theme from './Theme';
+import LayoutGallery from './LayoutGallery';
 
-function DashEditor({dashboardId}: {dashboardId: number}) {
+
+function DashEditor({dashboardId, ownerId}: {dashboardId: number, ownerId: number}) {
   const [dashboard, setDashboard] = useState({name: "Loading", ownerId: -1});
   const [newName, setNewName] = useState('');
   const [renaming, setRenaming] = useState(false);
+  //ts infer selectedLayout as number(-1 = nothing selected)
+  const [selectedLayoutId, setSelectedLayoutId] = useState(-1);
+
+  function updateSelected (param: number){
+    setSelectedLayoutId(param)
+  }
+
+  // const [userId, setUserId] = useState(ownerId);
+
 
   const loadDashboard = async () => {
     try {
       const response = await axios.get(`/dashboard/${dashboardId}`);
-      console.log(response);
-      console.log(response.data);
       setDashboard(response.data);
       setNewName(response.data.name);
     } catch (error) {
@@ -49,6 +58,10 @@ function DashEditor({dashboardId}: {dashboardId: number}) {
     loadDashboard();
   }, []);
 
+  useEffect(() => {
+    console.log('selectedLayoutId:', selectedLayoutId);
+  }, [selectedLayoutId]);
+
   const renderName = () => {
     if (renaming) {
       return (
@@ -69,7 +82,8 @@ function DashEditor({dashboardId}: {dashboardId: number}) {
     <>
       <h2>Editing: {renderName()}</h2>
       <Link to='/'>Done</Link>
-      <Theme dashboard={dashboard} />
+      <Theme dashboard={dashboard} ownerId={ownerId} />
+      <LayoutGallery onSelect={updateSelected}/>
     </>
   );
 }
