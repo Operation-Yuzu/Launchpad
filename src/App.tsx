@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 // import { useState } from 'react';
 import { BrowserRouter, Routes, Route } from "react-router";
@@ -9,7 +9,7 @@ import DashEditor from './DashEditor';
 import Calendar from './Calendar';
 
 function App() {
-  const [userId, setUserId] = useState(2);
+  const [userId, setUserId] = useState(2); // hardcoded user id state for now for testing purposes
   const [userDataMessage, setUserDataMessage] = useState(
     "You have not checked User Data.",
   );
@@ -37,7 +37,7 @@ function App() {
         console.log(res.data.id)
         setUserId(res.data.id)
       } else {
-        setUserDataMessage({name: 'Not logged in.'});
+        // setUserDataMessage({name: 'Not logged in.'}); commented out for now, causing me an error
         setUserId(-1);
       }
     }).catch((err) => {
@@ -45,21 +45,23 @@ function App() {
     })
   }
 
-
+  const getDashboardsData = useCallback(async () => {
+    
+    try {
+      const res = await axios.get(`/dashboard/all/${userId}`);
+      setDashboards(res.data);
+    } catch (err) {
+      console.error("There was a problem while getting user dashboards", err);
+    }
+  }, [userId]);
+  
   useEffect(() => {
     if (userId === -1) return; // TODO come back to update this once established
-console.log(userId)
-    const getDashboardsData = async () => {
-      try {
-        const res = await axios.get(`/dashboard/all/${userId}`);
-        setDashboards(res.data);
-      } catch (err) {
-        console.error("There was a problem while getting user dashboards", err);
-      }
-    };
 
-    getDashboardsData();
-  }, [userId]);
+    (async () => {
+      getDashboardsData();
+    })();
+  }, [userId, getDashboardsData]);
 
 
   return (
@@ -69,12 +71,12 @@ console.log(userId)
       <a className="button google" href="/login/federated/google">Sign in with Google</a>
       <button className="logout button google" onClick={() => {handleLogOut()}}>Log Out</button>
       <button className="testGetUserData" onClick={() => {getUserData()}}>Get User Data</button>
-      <p>{userDataMessage.name}</p>
+      <p>{userDataMessage}</p>
       <BrowserRouter>
         <Routes>
           <Route path='/' element={<Dashboard dashboardId={activeDash}/>} />
           <Route path='/edit' element={<DashEditor dashboardId={activeDash} ownerId={userId} />} />
-          <Route path="/hub" element={<Hub dashboards={dashboards}/>} />
+          <Route path="/hub" element={<Hub dashboards={dashboards} getDashboardData={getDashboardsData} ownerId={userId}/>} />
         </Routes>
         </BrowserRouter>
       <Calendar />
