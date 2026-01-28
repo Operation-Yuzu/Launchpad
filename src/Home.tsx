@@ -15,7 +15,7 @@ function Home (props: MyProps) {
 
   return (
     <>
-      <NavBar pages={["temp", "temp2", "temp"]}/>
+      <NavBar pages={["edit", "temp2", "temp"]}/>
       <Heading> Welcome to the placeholder home page </Heading>
       <Text> There will be a lot more here! </Text>
       <Box background="yellow.950" borderColor="yellow.border" borderWidth="3px" p="3" width="-moz-fit-content">
