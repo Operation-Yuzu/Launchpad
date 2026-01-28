@@ -14,7 +14,7 @@ import { useState, useEffect} from 'react';
 import Color from './ColorPicker';
 import axios from 'axios';
 import { ColorSwatch } from "@chakra-ui/react"
-import { Button} from "@chakra-ui/react"
+import { Box } from "@chakra-ui/react"
 import { Listbox, createListCollection } from "@chakra-ui/react"
 function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, ownerId: number}, ownerId: number, dashboardId : number}) {
   const [themesList, setThemesList] = useState([] as {id: number, navColor: string, bgColor: string, font: string}[]);
@@ -100,9 +100,13 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
 
   return (
     <div>
+      <Box bg={currTheme.navColor}> Hello
+        <Box bg={currTheme.bgColor}> Hello </Box>
+        <Box bg={currTheme.font}> Hello </Box>
+      </Box>
     {
       <Listbox.Root collection={allThemesList} width="320px">
-      <Listbox.Label>Select framework</Listbox.Label>
+      <Listbox.Label>Select Theme</Listbox.Label>
       <Listbox.Content>
         {allThemesList.items.map((theme) => (
           <Listbox.Item item={theme} key={theme.id} onClick={() => {
