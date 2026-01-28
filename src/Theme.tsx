@@ -26,9 +26,8 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
   const [fontPick, setFontPick] = useState('#ff0000');
   const [activeDash, setActiveDash] = useState({id: -1, navColor: 'string', bgColor: 'string', font: 'string'});
   const [currTheme, setCurrTheme] = useState(activeDash);
+  console.log(activeDash, 'HHEIEHEIEIHE')
   // first lets get all the themes of that user
-  console.log(activeDash, 'should be dash')
-  console.log(navColorPick , 'nav', bgColorPick, 'bg', fontPick, 'font')
   const allThemes = async () => {
 
     try {
@@ -76,11 +75,10 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
       }
   }
 
-    console.log(currTheme, 'this is current theme')
   // for patch - update the theme on the current dashboard
-  const updateTheme = async (themeId: any) => {
+  const updateTheme = async (data: any) => {
     try {
-    return await axios.patch(`/dashboard/${dashboardId}`, {themeId})
+    return await axios.patch(`/dashboard/${dashboardId}`, data)
     }catch (error) {
         console.error(error, 'something went wrong is getTheDash')
       }
@@ -103,7 +101,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
         return <ul>
           <button onClick={() => {
             setCurrTheme(theme);
-            updateTheme(theme.id)
+            updateTheme({themeId: theme.id})
             }}> navColor: {theme.navColor} bgColor: {theme.bgColor} font: {theme.font}</button>
         </ul>
       })

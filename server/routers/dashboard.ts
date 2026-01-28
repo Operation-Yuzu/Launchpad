@@ -122,25 +122,19 @@ router.post('/', async (req, res) => {
 router.patch('/:id', async (req, res) => {
   // TODO: auth!!
 
-  const { name } = req.body;
+  const { name, themeId } = req.body;
   const { id: idString } = req.params;
   const id = parseInt(idString);
-
-  const useToUpdate: any = {}
-
-  if(typeof name === 'string'){
-    useToUpdate.name = name;
-  } else if (typeof name === 'number'){
-    useToUpdate.themeId = name;
-  }
 
   try {
     await prisma.dashboard.update({
       where: {
         id
       },
-      data:
-        useToUpdate
+      data: {
+        name,
+        themeId
+      }
     });
 
     res.sendStatus(200);
