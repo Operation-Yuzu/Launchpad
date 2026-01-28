@@ -29,6 +29,7 @@ model GoogleToken {
   accountId     Int
   access_token  String
   id_token      String
+  expiry_date   DateTime
   authProfile   Boolean   @default(false)
   authGmail     Boolean   @default(false)
   authCalendar  Boolean   @default(false)

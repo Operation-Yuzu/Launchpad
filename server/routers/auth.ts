@@ -123,6 +123,7 @@ router.get('/auth/redirect/calendar', async (req: any, res) => {
         accountId: req.user.id,
         access_token: tokens.access_token as string,
         id_token: tokens.id_token as string,
+        expiry_date: new Date(tokens.expiry_date as number),
         authCalendar
       }
     });

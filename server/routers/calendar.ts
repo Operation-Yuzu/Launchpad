@@ -141,7 +141,22 @@ router.get('/list', async (req: any, res) => {
 // https://stackoverflow.com/questions/66312048/cant-override-express-request-user-type-but-i-can-add-new-properties-to-reques
 router.get('/checkauth', async (req: any, res) => {
   if (req.user) {
-    const numValidTokens = (await prisma.googleToken.findMany({where: {accountId: req.user.id, authCalendar: true}})).length;
+    const validTokens = (await prisma.googleToken.findMany({where: {accountId: req.user.id, authCalendar: true}}));
+
+    let numValidTokens = 0;
+    const now = new Date();
+
+    // delete out of date tokens, count valid ones
+    // there may be a better way to do this concurrently
+    // TODO: refactor to use refresh tokens. Instead of deleting, refresh and replace the token
+    validTokens.forEach(async token => {
+      if (token.expiry_date < now) {
+        await prisma.googleToken.delete({where: {id: token.id}});
+      } else {
+        numValidTokens++;
+      }
+    });
+
     if (numValidTokens > 0) {
       res.status(200).send(true);
     } else {
