@@ -10,6 +10,7 @@ import DashEditor from './DashEditor';
 import Home from './Home';
 
 import Calendar from './Calendar';
+import Email from './Email';
 
 function App() {
   const [userId, setUserId] = useState(-1);
@@ -67,6 +68,7 @@ function App() {
         </Routes>
         </BrowserRouter>
       <Calendar />
+      <Email />
     </>
   );
 }
