@@ -19,7 +19,7 @@ function Calendar() {
 
   const checkAuth = async () => {
     try {
-      const response = await axios.get('/calendar/checkauth');
+      const response = await axios.get('/checkauth/calendar');
       if (response.data === true) {
         setAuthStatus(AuthStatus.Authorized);
         getEvents();
