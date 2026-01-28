@@ -72,6 +72,7 @@ const scopes = {
 };
 
 // todo: use path param to check which authentication get
+// todo: authenticate app user!
 router.get('/auth/:widget', (req, res) => {
   let toAuthenticate: 'calendar' | 'gmail';
 
@@ -108,7 +109,6 @@ router.get('/auth/:widget', (req, res) => {
   res.redirect(authorizationUrl);
 });
 
-// TODO: single redirect for permissions?
 // TODO: fix any
 router.get('/auth/redirect/google', async (req: any, res) => {
   const oauth2Client = new google.auth.OAuth2(
@@ -128,9 +128,13 @@ router.get('/auth/redirect/google', async (req: any, res) => {
     const { tokens } = await oauth2Client.getToken(query.code as string);
     oauth2Client.setCredentials(tokens);
 
-    let authCalendar = false, authGmail = false;
+    let authCalendar = false, authGmail = false, authProfile = false;
 
     // TODO: deal with the rest of the scopes
+    if (tokens.scope?.includes('profile')) {
+      authProfile = true;
+    }
+
     if (tokens.scope?.includes('https://www.googleapis.com/auth/calendar.readonly')) {
       authCalendar = true;
     }
@@ -145,6 +149,7 @@ router.get('/auth/redirect/google', async (req: any, res) => {
         access_token: tokens.access_token as string,
         id_token: tokens.id_token as string,
         expiry_date: new Date(tokens.expiry_date as number),
+        authProfile,
         authCalendar,
         authGmail
       }
@@ -159,8 +164,25 @@ router.get('/auth/redirect/google', async (req: any, res) => {
 // todo: use path param to check which authentication to look for
 // https://stackoverflow.com/questions/66312048/cant-override-express-request-user-type-but-i-can-add-new-properties-to-reques
 router.get('/checkauth/:widget', async (req: any, res) => {
+  let toCheck: 'authCalendar' | 'authGmail' | 'authProfile';
+
+  switch (req.params.widget) {
+    case "calendar":
+      toCheck = 'authCalendar';
+      break;
+    case "gmail":
+      toCheck = 'authGmail';
+      break;
+    case "profile":
+      toCheck = 'authProfile';
+      break;
+    default:
+      res.sendStatus(404);
+      return;
+  }
+
   if (req.user) {
-    const validTokens = (await prisma.googleToken.findMany({where: {accountId: req.user.id, authCalendar: true}}));
+    const validTokens = (await prisma.googleToken.findMany({where: {accountId: req.user.id, [toCheck]: true}}));
 
     let numValidTokens = 0;
     const now = new Date();

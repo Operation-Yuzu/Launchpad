@@ -2,7 +2,23 @@ import { google } from 'googleapis';
 
 import { prisma } from '../database/prisma.js';
 
-export async function getGoogleOauth(userId: number) {
+export async function getGoogleOauth(userId: number, widget: string) {
+  let authType: 'authCalendar' | 'authGmail' | 'authProfile';
+
+  switch (widget) {
+    case 'calendar':
+      authType = 'authCalendar';
+      break;
+    case 'gmail':
+      authType = 'authGmail';
+      break;
+    case 'profile':
+      authType = 'authProfile';
+      break;
+    default: // not a valid widget type
+      return null;
+  }
+
   const oauth2Client = new google.auth.OAuth2(
     process.env['GOOGLE_CLIENT_ID'],
     process.env['GOOGLE_CLIENT_SECRET'],
@@ -12,7 +28,7 @@ export async function getGoogleOauth(userId: number) {
   const token = await prisma.googleToken.findFirst({
     where: {
       accountId: userId,
-      authCalendar: true
+      [authType]: true
     }
   });
 

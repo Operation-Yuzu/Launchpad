@@ -21,7 +21,7 @@ router.get('/', async (req: any, res) => {
   const userId = req.user?.id;
 
   try {
-    const oauth2Client = await getGoogleOauth(userId);
+    const oauth2Client = await getGoogleOauth(userId, 'calendar');
 
     if (oauth2Client === null) { // because no token for this user
       res.sendStatus(401);
@@ -70,7 +70,7 @@ router.get('/list', async (req: any, res) => {
   const userId = req.user?.id;
 
   try {
-    const oauth2Client = await getGoogleOauth(userId);
+    const oauth2Client = await getGoogleOauth(userId, 'calendar');
 
     if (oauth2Client === null) { // because no token for this user
       res.sendStatus(401);
