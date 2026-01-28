@@ -4,6 +4,7 @@ import passport from 'passport'
 //import { Prisma } from '@prisma/client';
 import { Prisma } from '../../generated/prisma/client.js'; // not sure about this, although it matches what was in database/prisma
 import { prisma } from '../database/prisma.js';
+import theme from './theme.js';
 
 const router = express.Router();
 
@@ -125,14 +126,21 @@ router.patch('/:id', async (req, res) => {
   const { id: idString } = req.params;
   const id = parseInt(idString);
 
+  const useToUpdate: any = {}
+
+  if(typeof name === 'string'){
+    useToUpdate.name = name;
+  } else if (typeof name === 'number'){
+    useToUpdate.themeId = name;
+  }
+
   try {
     await prisma.dashboard.update({
       where: {
         id
       },
-      data: {
-        name
-      }
+      data:
+        useToUpdate
     });
 
     res.sendStatus(200);
@@ -147,6 +155,8 @@ router.patch('/:id', async (req, res) => {
     res.sendStatus(500);
   }
 });
+
+
 
 // deletes dashboard based on dashboard id
 router.delete('/:id', async (req, res) => {
