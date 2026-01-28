@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type ChangeEvent } from 'react';
 
 import axios, { AxiosError } from 'axios';
 
-import type { Event } from '../types/Event.ts';
+import type { Event, CalendarObject } from '../types/Calendar.ts';
 
 // TODO: move into /types
 enum AuthStatus {
@@ -14,6 +14,8 @@ enum AuthStatus {
 function Calendar() {
   const [authStatus, setAuthStatus] = useState(AuthStatus.SignedOut);
   const [events, setEvents] = useState([] as Event[]);
+  const [calendars, setCalendars] = useState([] as CalendarObject[]);
+  const [activeCalendarId, setActiveCalendarId] = useState('');
 
   const checkAuth = async () => {
     try {
@@ -21,6 +23,7 @@ function Calendar() {
       if (response.data === true) {
         setAuthStatus(AuthStatus.Authorized);
         getEvents();
+        getCalendars();
       } else if (response.data === false) {
         setAuthStatus(AuthStatus.Unauthorized);
       } else {
@@ -35,19 +38,50 @@ function Calendar() {
     }
   }
 
-  const getEvents = async () => {
+  const handleCalendarSelect = (event: ChangeEvent) => {
+    const target = event.target as HTMLSelectElement;
+    getEvents(target.value);
+  }
+
+  const getEvents = async (calendarId = '') => {
+    const query = calendarId ? `?calendarId=${encodeURIComponent(calendarId)}` : ''; //apparently one of the Google calendars has a pound sign
+
     try {
-      const response = await axios.get('/calendar');
+      const response = await axios.get(`/calendar${query}`);
       setEvents(response.data);
+      setActiveCalendarId(calendarId);
     } catch (error) {
       console.error('Failed to get calendar events:', error);
     }
   };
 
+  const getCalendars = async () => {
+    try {
+      const response = await axios.get('/calendar/list');
+      setCalendars(response.data);
+    } catch (error) {
+      console.error('Failed to get calendars:', error);
+    }
+  }
+
   useEffect(() => {
     // TODO: if Calendar inherits a user through props, it may be possible to skip checking auth if we know the user is signed out
     checkAuth();
   }, []);
+
+  const renderCalendarList = () => {
+    if (authStatus === AuthStatus.Authorized) {
+      return (
+        <select onChange={handleCalendarSelect}>
+          {calendars.map(calendar => {
+            return <option value={calendar.id}>{calendar.summary}</option>;
+          })}
+        </select>
+      )
+    } else {
+      return null;
+    }
+  };
 
   const renderEvents = () => {
     switch (authStatus) {
@@ -79,6 +113,7 @@ function Calendar() {
   return (
     <div>
       <h6>Calendar</h6>
+      {renderCalendarList()}
       {renderEvents()}
     </div>
   );

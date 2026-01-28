@@ -18,14 +18,19 @@ interface PartDayTime {
 }
 
 interface EventAllDay extends EventBase {
-  start: AllDayTime
+  start: AllDayTime,
   end: AllDayTime
 }
 
 interface EventPartDay extends EventBase {
-  start: PartDayTime
+  start: PartDayTime,
   end: PartDayTime
 }
 
 export type Event = EventAllDay | EventPartDay;
 
+export type CalendarObject = {
+  id: string,
+  summary: string,
+  description: string
+}
