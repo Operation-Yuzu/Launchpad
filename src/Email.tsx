@@ -27,7 +27,12 @@ function Email () {
   };
 
   const getEmails = async () => {
-
+    try {
+      const response = await axios.get('/email');
+      console.log(response);
+    } catch (error) {
+      console.error('Failed to fetch emails:', error);
+    }
   };
 
   const renderEmails = () => {

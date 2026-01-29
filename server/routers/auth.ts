@@ -110,6 +110,7 @@ router.get('/auth/:widget', (req, res) => {
 });
 
 // TODO: fix any
+// TODO: delete superseded tokens?
 router.get('/auth/redirect/google', async (req: any, res) => {
   const oauth2Client = new google.auth.OAuth2(
     process.env['GOOGLE_CLIENT_ID'],
