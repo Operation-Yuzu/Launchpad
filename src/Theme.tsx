@@ -13,22 +13,22 @@
 import { useState, useEffect} from 'react';
 import Color from './ColorPicker';
 import axios from 'axios';
+import { ColorSwatch } from "@chakra-ui/react"
+import { Box } from "@chakra-ui/react"
+import { Listbox, createListCollection } from "@chakra-ui/react"
+function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, ownerId: number}, ownerId: number, dashboardId : number}) {
+  const [themesList, setThemesList] = useState([] as {id: number, navColor: string, bgColor: string, font: string}[]);
 
-
-
-function Theme ({dashboard, ownerId}: {dashboard: { name: string, ownerId: number}, ownerId: number}) {
-  const [themesList, setThemesList] = useState([] as {navColor: string, bgColor: string, font: string}[]);
-  const [currTheme, setCurrTheme] = useState(themesList[0]);
   // const [form, setForm] = useState({navColor: 'white', bgColor: 'white', font: 'ariel'});
   const [color, setColor] = useState('test')
   const [navColorPick, setNavColorPick] = useState('#ff0000');
   const [bgColorPick, setBgColorPick] = useState('#ff0000');
   const [fontPick, setFontPick] = useState('#ff0000');
+  const [activeDash, setActiveDash] = useState({id: -1, navColor: 'string', bgColor: 'string', font: 'string'});
+  const [currTheme, setCurrTheme] = useState(activeDash);
   // first lets get all the themes of that user
-  // console.log(test, 'testing')
-  console.log(navColorPick , 'nav', bgColorPick, 'bg', fontPick, 'font')
   const allThemes = async () => {
-    
+
     try {
       const test = await axios.get(`/theme/${ownerId}`);
       setThemesList(test.data);
@@ -37,64 +37,104 @@ function Theme ({dashboard, ownerId}: {dashboard: { name: string, ownerId: numbe
       console.error('Failed to get all of your themes', error);
     }
   }
-  
-  const colorPicker = (e: any) => {
-    setColor(e.value.toString('hex'));
-    //console.log(e.value.toString('hex'))
-    //setNavColorPick(e.value.toString('hex'))
-    
+
+  const colorPicker = (setter: (value: string) => void) => {
+    return (e: any) => {
+      setter(e.value.toString('hex'))
+    }
   }
 
-  // const createTheme = async () => {
-  //   try {
-  //     await axios.post('/theme', {
-  //       public: false,
-  //       navColor: navColorPick,
-  //       bgColor: bgColorPick,
-  //       font: fontPick,
-  //       ownerId: ownerId
-  //     })
-  //     allThemes();
-  //   } catch (error) {
-  //     console.error(error, 'something went wrong')
-  //   }
-  // }
+  const createTheme = async () => {
+    try {
+      await axios.post('/theme', {
+        public: false,
+        navColor: navColorPick,
+        bgColor: bgColorPick,
+        font: fontPick,
+        ownerId: ownerId
+      })
+      allThemes();
+    } catch (error) {
+      console.error(error, 'something went wrong')
+    }
+  }
 
-// test
-// const picker = Color();
+  const getTheDash = async () => {
+      try {
+        const dashes = await axios.get(`dashboard/all/${ownerId}`)
+        const dashboards = dashes.data;
+        dashboards.forEach((dash: any) => {
+          if(dash.id === dashboardId){
+            setActiveDash(dash)
+          }
+        })
+
+      } catch (error) {
+        console.error(error, 'something went wrong is getTheDash')
+      }
+  }
+
+  // for patch - update the theme on the current dashboard
+  const updateTheme = async (data: any) => {
+    try {
+    return await axios.patch(`/dashboard/${dashboardId}`, data)
+    }catch (error) {
+        console.error(error, 'something went wrong is getTheDash')
+      }
+  }
+
+  // for the list box
+  const allThemesList = createListCollection({
+    items: themesList,
+    itemToString: (item) => item.navColor,
+    itemToValue: (item) => item.id.toString()
+  })
 
   useEffect(() => {
     // if the owner is provided
     if(dashboard.ownerId){
       allThemes();
+      getTheDash();
     }
   }, [dashboard.ownerId])
 
   return (
     <div>
+      <Box bg={currTheme.navColor}> Hello
+        <Box bg={currTheme.bgColor}> Hello </Box>
+        <Box bg={currTheme.font}> Hello </Box>
+      </Box>
     {
-      themesList.map((theme) => {
-        return <ul>
-          <button onClick={() => setCurrTheme(theme)}> navColor: {theme.navColor} bgColor: {theme.bgColor} font: {theme.font}</button>
-        </ul>
-      })
+      <Listbox.Root collection={allThemesList} width="320px">
+      <Listbox.Label>Select Theme</Listbox.Label>
+      <Listbox.Content>
+        {allThemesList.items.map((theme) => (
+          <Listbox.Item item={theme} key={theme.id} onClick={() => {
+            setCurrTheme(theme)
+            updateTheme({themeId: theme.id})
+          }}>
+            <Listbox.ItemText> navColor: <ColorSwatch value={theme.navColor}/> bgColor: <ColorSwatch value={theme.bgColor}/> font: <ColorSwatch value={theme.font}/></Listbox.ItemText>
+            <Listbox.ItemIndicator />
+          </Listbox.Item>
+        ))}
+      </Listbox.Content>
+    </Listbox.Root>
     }
       <form>
         <label>navColor</label>
         <div id='navColor'>
-          
-          <Color onValueChange={(color) => setNavColorPick(color.toString('hex'))} />
+          <Color onValueChange={colorPicker(setNavColorPick)} />
         </div>
         <label>bgColor</label>
         <div id='bgColor'>
-          <Color onValueChange={(color) => setBgColorPick(color.toString('hex'))}/>
+          <Color onValueChange={colorPicker(setBgColorPick)}/>
         </div>
         <label>font</label>
         <div id='font'>
-          <Color onValueChange={(color) => setFontPick(color.toString('hex'))}/>
+          <Color onValueChange={colorPicker(setFontPick)}/>
         </div>
       </form>
-      <button>CREATE</button>
+      <button onClick={createTheme}>CREATE</button>
     </div>
   )
 }
