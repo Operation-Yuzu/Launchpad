@@ -8,7 +8,7 @@ type Layout = {
   layoutElements: [];
 };
 
-function LayoutGallery({onSelect, onCopy,}: {onSelect: (layoutId: number) => void; onCopy: (layoutId: number) => void;}) {
+function LayoutGallery({onSelect,}: {onSelect: (layoutId: number) => void;}) {
   const [layout, setLayout] = useState<Layout[]>([]);
 
   //when component is mounted fetch layouts
@@ -27,15 +27,11 @@ function LayoutGallery({onSelect, onCopy,}: {onSelect: (layoutId: number) => voi
 
   return (
     <>
-      <h3>LAYOUT GALLERY</h3>
-      {/* <button onClick={() => setLayout([1, 2, 3])}>
-        fake loads
-        </button> */}
+      <h3>YOUR LAYOUT GALLERY</h3>
        {layout.map((lay) => (
          <div key={lay.id}>
-          <p>LAYOUT #{lay.id}</p>
-          <button onClick={() => onSelect(lay.id)}> SELECT LAYOUT </button>
-          <button onClick={() => onCopy(lay.id)}>Copy Layout</button>
+          <p>PREVIEW LAYOUT #{lay.id}</p>
+          <button onClick={() => onSelect(lay.id)}> SelectLayout </button>
         </div>
 
       ))}

@@ -8,6 +8,7 @@ type Layout = {
   id: number;
   gridSize: string;
   layoutElements: [];
+
 };
 
 
@@ -76,10 +77,15 @@ function DashEditor({dashboardId, ownerId}: {dashboardId: number, ownerId: numbe
     });
   }, [selectedLayoutId]);
 
+  //Will create a copy of layout
   const copyLayout = async (layoutId: number) => {
+      if (!selectedLayout) return;
     try {
       const response = await axios.post(`/layout/${layoutId}/copy`)
       console.log('Layout is copied:', response.data)
+      //copy and preview copied layout
+      setSelectedLayout(response.data);
+      setSelectedLayoutId(response.data.id);
     } catch (error) {
       console.error('Failed to copy layout:', error);
     }
@@ -106,14 +112,15 @@ function DashEditor({dashboardId, ownerId}: {dashboardId: number, ownerId: numbe
     <>
       <h2>Editing: {renderName()}</h2>
       <Link to='/'>Done</Link>
-      <Theme dashboard={dashboard} ownerId={ownerId} />
-      <LayoutGallery onSelect={setSelectedLayoutId} onCopy={copyLayout}/>
+      <Theme dashboardId={dashboardId} dashboard={dashboard} ownerId={ownerId} />
+      <LayoutGallery onSelect={setSelectedLayoutId}/>
+
       {selectedLayout && (
         <>
         <h4>LAYOUT PREVIEW</h4>
         <p>SELECTED LAYOUT #{selectedLayoutId}</p>
         <p>GRID SIZE: {selectedLayout.gridSize}</p>
-        <p>ELEMENTS: {selectedLayout.layoutElements.length}</p>
+        <button onClick={() => copyLayout(selectedLayout.id)}> COPY CURRENT LAYOUT </button>
         </>
       )}
     </>
