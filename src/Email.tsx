@@ -5,6 +5,7 @@ import { AuthStatus } from '../types/AuthStatus.ts';
 
 function Email () {
   const [authStatus, setAuthStatus] = useState(AuthStatus.SignedOut);
+  const [emails, setEmails] = useState([] as {id: string, snippet: string}[]);
 
   const checkAuth = async () => {
     try {
@@ -29,7 +30,7 @@ function Email () {
   const getEmails = async () => {
     try {
       const response = await axios.get('/email');
-      console.log(response);
+      setEmails(response.data);
     } catch (error) {
       console.error('Failed to fetch emails:', error);
     }
@@ -38,7 +39,15 @@ function Email () {
   const renderEmails = () => {
     switch(authStatus) {
       case AuthStatus.Authorized:
-        return <p>Unimplemented! :(</p>
+        if (emails.length === 0) {
+          return <p>No emails to show.</p>;
+        } else {
+          return (
+            emails.map(email => {
+              return <p>{email.snippet}</p>;
+            })
+          );
+        }
         break;
       case AuthStatus.Unauthorized:
         return <a href='/auth/gmail'>Authorize Gmail</a>

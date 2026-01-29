@@ -1,7 +1,8 @@
 import express from 'express';
 import { google } from 'googleapis';
 
-import { getGoogleOauth } from '../utils/googleapi.js'
+import { getGoogleOauth } from '../utils/googleapi.js';
+import { batchFetchImplementation } from '@jrmdayn/googleapis-batcher';
 
 const email = express.Router();
 
@@ -21,16 +22,30 @@ email.get('/', async (req: any, res) => {
       return;
     }
 
-    const gmail = google.gmail({version: 'v1', auth: oauth2Client});
+    const fetchImpl = batchFetchImplementation();
+
+    const gmail = google.gmail({version: 'v1', auth: oauth2Client, fetchImplementation: fetchImpl});
 
     const result = await gmail.users.messages.list({
       userId: 'me',
       maxResults: 10
     });
 
-    const emails = result.data.messages;
+    const messageIds = result.data.messages;
 
-    res.status(200).send(emails);
+    if (messageIds === undefined) {
+      res.status(200).send('No messages found.');
+      return;
+    }
+
+    const emailResponseObjects = await Promise.all(messageIds.map(message => {
+      return gmail.users.messages.get({
+        id: message.id as string,
+        userId: 'me',
+      });
+    }));
+
+    res.status(200).send(emailResponseObjects.map(response => response.data));
 
   } catch (error) {
     console.error('Failed to fetch emails:', error);
