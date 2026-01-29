@@ -11,6 +11,7 @@ function Email () {
       const response = await axios.get('/checkauth/gmail');
       if (response.data === true) {
         setAuthStatus(AuthStatus.Authorized);
+        getEmails();
       } else if (response.data === false) {
         setAuthStatus(AuthStatus.Unauthorized);
       } else {
@@ -23,7 +24,25 @@ function Email () {
         console.error('Failed to check auth status:', error);
       }
     }
-  }
+  };
+
+  const getEmails = async () => {
+
+  };
+
+  const renderEmails = () => {
+    switch(authStatus) {
+      case AuthStatus.Authorized:
+        return <p>Unimplemented! :(</p>
+        break;
+      case AuthStatus.Unauthorized:
+        return <a href='/auth/gmail'>Authorize Gmail</a>
+        break;
+      case AuthStatus.SignedOut:
+        return <p>Please sign in.</p>;
+        break;
+    }
+  };
 
   useEffect(() => {
     checkAuth();
@@ -32,7 +51,7 @@ function Email () {
   return (
     <div>
       <h6>Email</h6>
-      <p>Auth status: {authStatus}</p>
+      {renderEmails()}
     </div>
   );
 }
