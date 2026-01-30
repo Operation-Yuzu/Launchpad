@@ -152,6 +152,33 @@ router.patch('/:id', async (req, res) => {
 });
 
 
+router.patch('/:id/layout', async (req, res) => {
+  const { id: idString } = req.params;
+
+  const dashboardId = parseInt(idString);
+  const { layoutId } = req.body;
+
+  //If no layoutId to apply
+  if(!layoutId){
+    return res.status(400)
+  }
+
+  try{
+    //Query db and find dashboard where id = dashboardId
+    const dashboard = await prisma.dashboard.update({
+      where:{ id: dashboardId },
+      //Update its layoutId to the new layout
+      data: { layoutId }
+    });
+    //Return updated dashboard
+    res.status(200).send(dashboard);
+  } catch (err) {
+    console.error("Could not apply layout:", err);
+    return res.status(500).send({'Could not apply chosen layout:': err});
+  }
+})
+
+
 
 // deletes dashboard based on dashboard id
 router.delete('/:id', async (req, res) => {
