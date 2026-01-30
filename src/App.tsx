@@ -78,8 +78,6 @@ function App() {
           <Route path="/hub" element={<Hub dashboards={dashboards} getDashboardData={getDashboardsData} ownerId={userId}/>} />
         </Routes>
         </BrowserRouter>
-      <Calendar />
-      <Email />
     </>
   );
 }
