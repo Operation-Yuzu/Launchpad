@@ -3,7 +3,7 @@ import { useState, useEffect, type ChangeEvent } from 'react';
 import axios, { AxiosError } from 'axios';
 
 import { Button, Flex, For, Heading, Icon, LinkBox, LinkOverlay, NativeSelect, ScrollArea, Text, VStack } from '@chakra-ui/react';
-import { LuCalendarDays } from "react-icons/lu"
+import { LuCalendarDays } from 'react-icons/lu';
 
 
 import type { Event, CalendarObject } from '../types/Calendar.ts';
@@ -70,7 +70,7 @@ function Calendar() {
   const renderCalendarList = () => {
     if (authStatus === AuthStatus.Authorized) {
       return (
-        <NativeSelect.Root variant={'subtle'} marginBottom="0.5rem">
+        <NativeSelect.Root variant={'subtle'}>
           <NativeSelect.Field onChange={handleCalendarSelect}>
             <For
               each={calendars}
