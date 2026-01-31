@@ -10,6 +10,7 @@ import DashEditor from './DashEditor';
 import Home from './Home';
 
 import Calendar from './Calendar';
+import Email from './Email';
 
 function App() {
   const [userId, setUserId] = useState(2); // hardcoded user id state for now for testing purposes
@@ -36,7 +37,7 @@ function App() {
   const getUserData = () => {
     axios.get('/user').then((res) => {
       if (res.data.id) { // not sure about this
-        setUserDataMessage(res.data);
+        // setUserDataMessage(res.data);
         console.log(res.data.id)
         setUserId(res.data.id)
       } else {
@@ -71,13 +72,12 @@ function App() {
     <>
       <BrowserRouter>
         <Routes>
-          <Route path='/' element={<Home getUserData={getUserData} handleLogOut={handleLogOut} userDataMessage={userDataMessage}/>} />
+          <Route path='/' element={<Home getUserData={getUserData} handleLogOut={handleLogOut} userId={userId} />} />
           <Route path='/dashboard' element={<Dashboard dashboardId={activeDash}/>} />
           <Route path='/edit' element={<DashEditor dashboardId={activeDash} ownerId={userId} />} />
           <Route path="/hub" element={<Hub dashboards={dashboards} getDashboardData={getDashboardsData} ownerId={userId}/>} />
         </Routes>
         </BrowserRouter>
-      <Calendar />
     </>
   );
 }
