@@ -21,6 +21,7 @@ model User {
   credentialSubject  String
   themes             Theme[]
   layouts            Layout[]
+  Timer              Timer?
 }
 
 model GoogleToken {
@@ -91,4 +92,11 @@ model Widget {
   id             Int             @id @default(autoincrement())
   name           String
   layoutElements LayoutElement[]
+}
+
+model Timer {
+  id        Int       @id @default(autoincrement())
+  owner     User      @relation(fields: [ownerId], references: [id])
+  ownerId   Int       @unique
+  expiresAt DateTime
 }
