@@ -151,11 +151,12 @@ router.patch('/:id', async (req, res) => {
   }
 });
 
-
+//This route should update layout used by a dashboard
 router.patch('/:id/layout', async (req, res) => {
+  //Grab the dashboard id
   const { id: idString } = req.params;
-
   const dashboardId = parseInt(idString);
+  //Grab layout to apply
   const { layoutId } = req.body;
 
   //If no layoutId to apply

@@ -90,7 +90,17 @@ function DashEditor({dashboardId, ownerId}: {dashboardId: number, ownerId: numbe
       console.error('Failed to copy layout:', error);
     }
 
+  // }
+
+  //Should apply selected layout to dashboard
+  const applyLayout = async () =>  {
+    try{
+    const response = await axios.patch(`/dashboard/${dashboardId}/layout`, {layoutId: selectedLayoutId});
+    console.log("Layout applied", response.data)
+  }catch (error){
+    console.log("Could not apply layout", error)
   }
+}
 
   const renderName = () => {
     if (renaming) {
@@ -120,7 +130,7 @@ function DashEditor({dashboardId, ownerId}: {dashboardId: number, ownerId: numbe
         <h4>LAYOUT PREVIEW</h4>
         <p>SELECTED LAYOUT #{selectedLayoutId}</p>
         <p>GRID SIZE: {selectedLayout.gridSize}</p>
-        <button onClick={() => copyLayout(selectedLayout.id)}> COPY CURRENT LAYOUT </button>
+        <button onClick={applyLayout}> APPLY CURRENT LAYOUT </button>
         </>
       )}
     </>
