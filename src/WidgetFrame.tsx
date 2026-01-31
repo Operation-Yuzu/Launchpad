@@ -21,6 +21,7 @@ enum Corner {
 function SideHandle({side, parentWidth, parentHeight, resize, snap}: {side: Side, parentWidth: number, parentHeight: number, resize: (side: Side, delta: number) => void, snap: (side: Side) => void}) {
   let posX, posY;
   let width, height;
+  let cursor;
 
   switch (side) {
     case Side.Top:
@@ -28,24 +29,28 @@ function SideHandle({side, parentWidth, parentHeight, resize, snap}: {side: Side
       posY = 0;
       width = parentWidth - 2 * handleThickness;
       height = handleThickness;
+      cursor = 'ns-resize';
       break;
     case Side.Bottom:
       posX = handleThickness;
       posY = parentHeight - handleThickness;
       width = parentWidth - 2 * handleThickness;
       height = handleThickness;
+      cursor = 'ns-resize';
       break;
     case Side.Left:
       posX = 0;
       posY = handleThickness;
       width = handleThickness;
       height = parentHeight - 2 * handleThickness;
+      cursor = 'ew-resize';
       break;
     case Side.Right:
       posX = parentWidth - handleThickness;
       posY = handleThickness;
       width = handleThickness;
       height = parentHeight - 2 * handleThickness;
+      cursor = 'ew-resize';
       break;
   }
 
@@ -79,7 +84,7 @@ function SideHandle({side, parentWidth, parentHeight, resize, snap}: {side: Side
 
   return (
     <Container
-      bg="purple"
+      opacity="0"
       position="absolute"
       top={`${posY}px`}
       left={`${posX}px`}
@@ -87,6 +92,7 @@ function SideHandle({side, parentWidth, parentHeight, resize, snap}: {side: Side
       height={`${height}px`}
       padding="0px"
       onMouseDown={handleMouseDown}
+      cursor={cursor}
     >
     </Container>
   );
@@ -94,24 +100,29 @@ function SideHandle({side, parentWidth, parentHeight, resize, snap}: {side: Side
 
 function CornerHandle({corner, parentWidth, parentHeight, resize, snap}: {corner: Corner, parentWidth: number, parentHeight: number, resize: (side: Side, delta: number) => void, snap: (side: Side) => void}) {
   let posX, posY;
+  let cursor;
   const width = handleThickness, height = handleThickness;
 
   switch (corner) {
     case Corner.TopLeft:
       posX = 0;
       posY = 0;
+      cursor = 'nwse-resize';
       break;
     case Corner.TopRight:
       posX = parentWidth - handleThickness;
       posY = 0;
+      cursor = 'nesw-resize';
       break;
     case Corner.BottomLeft:
       posX = 0;
       posY = parentHeight - handleThickness;
+      cursor = 'nesw-resize';
       break;
     case Corner.BottomRight:
       posX = parentWidth - handleThickness;
       posY = parentHeight - handleThickness;
+      cursor = 'nwse-resize';
       break;
   }
 
@@ -171,7 +182,7 @@ function CornerHandle({corner, parentWidth, parentHeight, resize, snap}: {corner
 
   return (
     <Container
-      bg="red"
+      opacity="0"
       position="absolute"
       top={`${posY}px`}
       left={`${posX}px`}
@@ -179,12 +190,13 @@ function CornerHandle({corner, parentWidth, parentHeight, resize, snap}: {corner
       height={`${height}px`}
       padding="0px"
       onMouseDown={handleMouseDown}
+      cursor={cursor}
     >
     </Container>
   );
 }
 
-function WidgetFrame({x1, y1, x2, y2, minWidth, minHeight, snapSize, children}: {x1: number, y1: number, x2: number, y2: number, minWidth: number, minHeight: number, snapSize: number, children?: React.ReactNode}) {
+function WidgetFrame({x1, y1, x2, y2, minWidth, minHeight, snapSize, resizeActive, children}: {x1: number, y1: number, x2: number, y2: number, minWidth: number, minHeight: number, snapSize: number, resizeActive: boolean, children?: React.ReactNode}) {
   const [top, setTop] = useState(y1 * snapSize);
   const [bottom, setBottom] = useState(y2 * snapSize);
   const [left, setLeft] = useState(x1 * snapSize);
@@ -259,19 +271,31 @@ function WidgetFrame({x1, y1, x2, y2, minWidth, minHeight, snapSize, children}: 
     }
   };
 
+  const renderResizeHandles = () => {
+    if (resizeActive) {
+      return (
+        <>
+          <For
+            each={Object.values(Side)}
+          >
+            {(item) => <SideHandle side={item} parentWidth={right-left} parentHeight={bottom-top} resize={resize} snap={snap}/>}
+          </For>
+          <For
+            each={Object.values(Corner)}
+          >
+            {(item) => <CornerHandle corner={item} parentWidth={right-left} parentHeight={bottom-top} resize={resize} snap={snap}/>}
+          </For>
+        </>
+      );
+    } else {
+      return null;
+    }
+  };
+
   return (
     <Container padding="5" bg="blue" position="absolute" top={`${top}px`} left={`${left}px`} width={`${right-left}px`} height={`${bottom-top}px`} overflow="clip">
       {children}
-      <For
-        each={Object.values(Side)}
-      >
-        {(item) => <SideHandle side={item} parentWidth={right-left} parentHeight={bottom-top} resize={resize} snap={snap}/>}
-      </For>
-      <For
-        each={Object.values(Corner)}
-      >
-        {(item) => <CornerHandle corner={item} parentWidth={right-left} parentHeight={bottom-top} resize={resize} snap={snap}/>}
-      </For>
+      {renderResizeHandles()}
     </Container>
   );
 }

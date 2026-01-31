@@ -30,8 +30,9 @@ function Dashboard ({dashboardId}: {dashboardId: number}) {
         y1={1}
         x2={6}
         y2={6}
-        minWidth={1}
-        minHeight={1}
+        minWidth={2}
+        minHeight={3}
+        resizeActive={true}
         snapSize={100}
       >
         <Calendar />
@@ -43,6 +44,7 @@ function Dashboard ({dashboardId}: {dashboardId: number}) {
         y2={6}
         minWidth={1}
         minHeight={1}
+        resizeActive={false}
         snapSize={100}
       >
         <Email/>
