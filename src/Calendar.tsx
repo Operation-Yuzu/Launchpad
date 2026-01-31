@@ -2,6 +2,8 @@ import { useState, useEffect, type ChangeEvent } from 'react';
 
 import axios, { AxiosError } from 'axios';
 
+import { Container, Flex, For, ScrollArea, Text, VStack } from '@chakra-ui/react';
+
 import type { Event, CalendarObject } from '../types/Calendar.ts';
 import { AuthStatus } from '../types/AuthStatus.ts';
 
@@ -80,7 +82,7 @@ function Calendar() {
   const renderEvents = () => {
     switch (authStatus) {
       case AuthStatus.SignedOut:
-        return <p>Please sign in.</p>;
+        return <Text w="100%">Please sign in.</Text>;
         break;
       case AuthStatus.Unauthorized:
         return (
@@ -88,28 +90,40 @@ function Calendar() {
         )
         break;
       case AuthStatus.Authorized:
-        if (events.length > 0) {
-          return events.map((event) => {
-            return (
-              <div>
-                <p>{event.summary}</p>
-              </div>
-            )
-          });
-        } else {
-          return <p>No events found.</p>;
-        }
-        break;
+        return (
+          <ScrollArea.Root>
+            <ScrollArea.Viewport>
+              <ScrollArea.Content>
+                <VStack>
+                  <For
+                    each={events}
+                    fallback={<Text w="100%">No events found.</Text>}
+                  >
+                    {(event) => (
+                        <Text w="100%">{event.summary}</Text>
+                      )
+                    }
+                  </For>
+                </VStack>
+              </ScrollArea.Content>
+            </ScrollArea.Viewport>
+            <ScrollArea.Scrollbar>
+              <ScrollArea.Thumb />
+            </ScrollArea.Scrollbar>
+            <ScrollArea.Corner />
+          </ScrollArea.Root>
+        );
+      break;
     }
 
   };
 
   return (
-    <div>
+    <Flex direction="column" height="100%">
       <h6>Calendar</h6>
       {renderCalendarList()}
       {renderEvents()}
-    </div>
+    </Flex>
   );
 }
 
