@@ -139,5 +139,16 @@ phoneNumbers.patch('/verify/:ownerId', async (req, res) => {
     }
   })
 
-
+phoneNumbers.delete('/:ownerId', async (req, res) => {
+  try {
+    await prisma.phoneNumbers.delete({
+      where: {
+        userId: Number(req.params.ownerId)
+      }
+    })
+    res.status(200).send('Successful')
+  } catch (error) {
+      res.status(500).send({'Could not delete': error})
+    }
+})
 export default phoneNumbers;
