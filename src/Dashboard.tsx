@@ -2,6 +2,10 @@ import { useState, useEffect } from 'react';
 import { Link } from "react-router";
 import axios from 'axios';
 
+import WidgetFrame from './WidgetFrame';
+import Calendar from './Calendar';
+import Email from './Email';
+
 function Dashboard ({dashboardId}: {dashboardId: number}) {
   const [dashboard, setDashboard] = useState({name: "Loading"});
   const loadDashboard = async () => {
@@ -21,6 +25,30 @@ function Dashboard ({dashboardId}: {dashboardId: number}) {
     <>
       <h2>{dashboard.name}</h2>
       <Link to='/edit'>Edit</Link>
+      <WidgetFrame
+        x1={1}
+        y1={1}
+        x2={6}
+        y2={6}
+        minWidth={2}
+        minHeight={3}
+        resizeActive={true}
+        snapSize={100}
+      >
+        <Calendar />
+      </WidgetFrame>
+      <WidgetFrame
+        x1={7}
+        y1={1}
+        x2={12}
+        y2={6}
+        minWidth={1}
+        minHeight={1}
+        resizeActive={false}
+        snapSize={100}
+      >
+        <Email/>
+      </WidgetFrame>
     </>
   );
 }
