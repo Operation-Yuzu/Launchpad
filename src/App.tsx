@@ -75,7 +75,7 @@ function App() {
           <Route path='/' element={<Home getUserData={getUserData} handleLogOut={handleLogOut} userId={userId} />} />
           <Route path='/dashboard' element={<Dashboard dashboardId={activeDash}/>} />
           <Route path='/edit' element={<DashEditor dashboardId={activeDash} ownerId={userId} />} />
-          <Route path="/hub" element={<Hub dashboards={dashboards} getDashboardData={getDashboardsData} ownerId={userId}/>} />
+          <Route path="/hub" element={<Hub dashboards={dashboards} getDashboardData={getDashboardsData} ownerId={userId} activeDash={activeDash}/>} />
         </Routes>
         </BrowserRouter>
     </>
