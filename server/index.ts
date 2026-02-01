@@ -2,6 +2,8 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import express from 'express';
 
+import { loadDashboardSchedules } from './cron/dashboard-scheduler.js';
+
 import router from './routers/router.js';
 
 // * AUTH
@@ -21,6 +23,8 @@ import layout from './routers/layout.js';
 import user from './routers/user.js'
 import calendar from './routers/calendar.js';
 import email from './routers/email.js';
+import dashboard from './routers/dashboard.js';
+import schedule from './routers/schedule.js'
 
 const app = express();
 
@@ -51,6 +55,8 @@ app.use('/', authRouter);
 // * AUTH 
 
 app.use(router);
+app.use('/schedule', schedule)
+app.use('/dashboard', dashboard)
 app.use('/theme', theme);
 app.use('/calendar', calendar);
 app.use('/layout', layout);
@@ -62,6 +68,14 @@ app.get('/*any', (req, res) => {
   res.sendFile(join(__dirname, '..', '..', 'dist', 'index.html'));
 })
 
-app.listen(port, host, () => {
-  console.info(`Listening on http://localhost:${port}`);
-});
+// wait for dashboard scheduler before starting server
+async function startServer() {
+  await loadDashboardSchedules();
+
+  app.listen(port, host, () => {
+    console.info(`Listening on http://localhost:${port}`);
+  });
+}
+
+
+startServer();

@@ -3,14 +3,13 @@ import passport from 'passport'
 
 //import { Prisma } from '@prisma/client';
 import { Prisma } from '../../generated/prisma/client.js'; // not sure about this, although it matches what was in database/prisma
-import { User } from '../../generated/prisma/client.js'
 import { prisma } from '../database/prisma.js';
 import theme from './theme.js';
 
-const router = express.Router();
+const dashboard = express.Router();
 
 // used to grab all of a specific user's dashboards
-router.get('/all/:id', async (req, res) => {
+dashboard.get('/all/:id', async (req, res) => {
 // TODO AUTH
   const { id: idString } = req.params;
   const id = parseInt(idString);
@@ -74,7 +73,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+dashboard.post('/', async (req, res) => {
   // TODO: all sorts of auth
   // only authorized users should be allowed to create dashboards
   // the user's identity should be pulled from the session info
@@ -130,7 +129,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.patch('/:id', async (req, res) => {
+dashboard.patch('/:id', async (req, res) => {
   // TODO: auth!!
 
   const { name, themeId } = req.body;
@@ -226,7 +225,7 @@ router.post('/:dashboardId/layout/:layoutId', async (req, res) => {
 
 
 // deletes dashboard based on dashboard id
-router.delete('/:id', async (req, res) => {
+dashboard.delete('/:id', async (req, res) => {
 
   // TODO AUTH
 
@@ -253,5 +252,7 @@ router.delete('/:id', async (req, res) => {
   }
 })
 
+// delete
 
-export default router;
+
+export default dashboard;
