@@ -29,7 +29,7 @@ function LayoutGallery({onSelect,}: {onSelect: (layoutId: number) => void;}) {
 
   return (
     <>
-      <h3>YOUR LAYOUT GALLERY</h3>
+      <h3>PUBLIC LAYOUTS</h3>
       <Grid>
        {layout.map((lay) => (
          <div key={lay.id}>
