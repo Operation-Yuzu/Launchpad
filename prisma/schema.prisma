@@ -21,6 +21,7 @@ model User {
   credentialSubject  String
   themes             Theme[]
   layouts            Layout[]
+  phoneNumber        PhoneNumbers?
   dashboardSchedules DashboardSchedule[]
 }
 
@@ -95,6 +96,14 @@ model Widget {
   layoutElements LayoutElement[]
 }
 
+model PhoneNumbers {
+  id              Int     @id @default(autoincrement())
+  user            User    @relation(fields: [userId], references: [id])
+  userId          Int     @unique
+  contactNumber   String
+  verified        Boolean @default(false)
+  notifications   Boolean @default(false)
+}
 model DashboardSchedule {
   id          Int       @id @default(autoincrement())
   owner       User      @relation(fields: [ownerId], references: [id])
