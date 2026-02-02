@@ -596,7 +596,7 @@ export default function Hub({
           </Flex>
         </Box>
       </Flex>
-      <Notifications />
+      <Notifications ownerId={ownerId}/>
     </>
   );
 }
