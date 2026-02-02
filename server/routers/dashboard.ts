@@ -3,14 +3,13 @@ import passport from 'passport'
 
 //import { Prisma } from '@prisma/client';
 import { Prisma } from '../../generated/prisma/client.js'; // not sure about this, although it matches what was in database/prisma
-import { User } from '../../generated/prisma/client.js'
 import { prisma } from '../database/prisma.js';
 import theme from './theme.js';
 
-const router = express.Router();
+const dashboard = express.Router();
 
 // used to grab all of a specific user's dashboards
-router.get('/all/:id', async (req, res) => {
+dashboard.get('/all/:id', async (req, res) => {
 // TODO AUTH
   const { id: idString } = req.params;
   const id = parseInt(idString);
@@ -37,7 +36,7 @@ router.get('/all/:id', async (req, res) => {
   }
 });
 
-router.get('/:id', async (req, res) => {
+dashboard.get('/:id', async (req, res) => {
   // there should be some sort of auth here to check if the given dashboard
   // either belongs to the user or is public
 
@@ -74,11 +73,17 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+dashboard.post('/', async (req, res) => {
   // TODO: all sorts of auth
   // only authorized users should be allowed to create dashboards
   // the user's identity should be pulled from the session info
   // rather than just being the client saying "trust me bro"
+
+  // check auth
+  if (req.user === undefined) {
+    res.sendStatus(401);
+    return;
+  }
 
   const { ownerId, name } = req.body;
 
@@ -130,8 +135,12 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.patch('/:id', async (req, res) => {
-  // TODO: auth!!
+dashboard.patch('/:id', async (req, res) => {
+  // check auth
+  if (req.user === undefined) {
+    res.sendStatus(401);
+    return;
+  }
 
   const { name, themeId } = req.body;
   const { id: idString } = req.params;
@@ -162,7 +171,7 @@ router.patch('/:id', async (req, res) => {
 });
 
 //This route should update layout used by a dashboard
-router.post('/:dashboardId/layout/:layoutId', async (req, res) => {
+dashboard.post('/:dashboardId/layout/:layoutId', async (req, res) => {
   const dashboardId = Number(req.params.dashboardId)
   const layoutId = Number(req.params.layoutId);
   const userId = 1; //TODO: add auth
@@ -226,7 +235,7 @@ router.post('/:dashboardId/layout/:layoutId', async (req, res) => {
 
 
 // deletes dashboard based on dashboard id
-router.delete('/:id', async (req, res) => {
+dashboard.delete('/:id', async (req, res) => {
 
   // TODO AUTH
 
@@ -253,5 +262,7 @@ router.delete('/:id', async (req, res) => {
   }
 })
 
+// delete
 
-export default router;
+
+export default dashboard;
