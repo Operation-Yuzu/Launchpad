@@ -70,7 +70,7 @@ const deleteNumber = async () => {
   return (
     <div>
       <p>{phoneNumber}</p>
-      <input type='text' value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
+      <input type='tel' value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
       <button onClick={() => {
         if(phoneNumber.length > 0){
          addNumber()
@@ -78,7 +78,7 @@ const deleteNumber = async () => {
         
       }}>Save Phone Number</button>
       <p>Update Phone Number</p>
-      <input type='text' value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
+      <input type='tel' value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
       <button onClick={() => {
         if(phoneNumber.length > 0){
          updateNumber()

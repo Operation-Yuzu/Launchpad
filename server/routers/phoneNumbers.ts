@@ -2,6 +2,12 @@ import express from 'express';
 
 import { prisma } from '../database/prisma.js';
 import { stat } from 'node:fs';
+import { Client } from 'pg';
+import "dotenv/config";
+import twilio from 'twilio'
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const client = twilio(accountSid, authToken);
 
 const phoneNumbers = express.Router();
 
@@ -29,7 +35,7 @@ phoneNumbers.post('/:ownerId', async (req, res) => {
   // if no number is provided
   if(!contactNumber){
     res.status(404).send({error: 'You need to provide a phone number'})
-    return;
+    //return;
   }
   try {
     const existing = await prisma.phoneNumbers.findUnique({
@@ -42,7 +48,7 @@ phoneNumbers.post('/:ownerId', async (req, res) => {
     if(existing){
 
       res.status(404).send('You already have a phone number')
-      return;
+      //return;
     }
 
       await prisma.phoneNumbers.create({
@@ -63,6 +69,40 @@ phoneNumbers.post('/:ownerId', async (req, res) => {
 
 })
 
+// send the verification code
+phoneNumbers.post('/verify/send/:ownerId', async (req, res) => {
+  try {
+    const existing = await prisma.phoneNumbers.findUnique({
+      where: {
+        userId: Number(req.params.ownerId)
+      }
+    })
+
+    if(!existing){
+      res.status(404).send('Could not find your account')
+    }
+
+    if(!existing?.contactNumber){
+      res.status(404).send('Phone Number would not be found')
+    }
+    const phone = existing?.contactNumber as string
+
+    
+    const verification = await client.verify.v2.services("VA7937e5f669dd205b29a3a78482ad9b64")
+    .verifications
+    .create({to: phone, channel: 'sms'})
+    .then(verification => console.log(verification.sid))
+
+    res.status(201).send(verification)
+  } catch (error) {
+    res.status(500).send({'something went wrong with sending the verification code' : error})
+  }
+})
+
+
+
+
+
 // PATCH - need to make it to where if they want to change the number, they can
 // but also if they click a button or verify those fields are changed too
 phoneNumbers.patch('/:ownerId', async (req, res) => {
@@ -77,7 +117,7 @@ phoneNumbers.patch('/:ownerId', async (req, res) => {
     // check if it exist
     if(!existing){
       res.status(404).send('You have nothing to update')
-      return;
+      //return;
     }
 
     const data: {
@@ -124,7 +164,7 @@ phoneNumbers.patch('/verify/:ownerId', async (req, res) => {
 
     if(existing?.verified === true){
       res.status(404).send('This number is already verified')
-      return;
+      //return;
     }
 
     await prisma.phoneNumbers.update({
@@ -153,4 +193,6 @@ phoneNumbers.delete('/:ownerId', async (req, res) => {
       res.status(500).send({'Could not delete': error})
     }
 })
+
+
 export default phoneNumbers;
