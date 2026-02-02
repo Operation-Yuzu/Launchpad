@@ -18,14 +18,6 @@ import { PrismaSessionStore } from '@quixo3/prisma-session-store';
 const connectionString = `${process.env.DATABASE_URL}`;
 const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({ adapter });
-import theme from './routers/theme.js'
-import layout from './routers/layout.js';
-import user from './routers/user.js'
-import calendar from './routers/calendar.js';
-import email from './routers/email.js';
-import phoneNumbers from './routers/phoneNumbers.js';
-import dashboard from './routers/dashboard.js';
-import schedule from './routers/schedule.js'
 
 const app = express();
 
@@ -56,14 +48,6 @@ app.use('/', authRouter);
 // * AUTH 
 
 app.use(router);
-app.use('/schedule', schedule)
-app.use('/dashboard', dashboard)
-app.use('/theme', theme);
-app.use('/calendar', calendar);
-app.use('/layout', layout);
-app.use('/user', user);
-app.use('/email', email);
-app.use('/notifications', phoneNumbers)
 
 // Catch all for client side routes
 app.get('/*any', (req, res) => {

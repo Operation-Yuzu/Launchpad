@@ -5,6 +5,7 @@ import axios from 'axios';
 import WidgetFrame from './WidgetFrame';
 import Calendar from './Calendar';
 import Email from './Email';
+import Timer from './Timer';
 
 function Dashboard ({dashboardId}: {dashboardId: number}) {
   const [dashboard, setDashboard] = useState({name: "Loading"});
@@ -44,10 +45,22 @@ function Dashboard ({dashboardId}: {dashboardId: number}) {
         y2={6}
         minWidth={1}
         minHeight={1}
-        resizeActive={false}
+        resizeActive={true}
         snapSize={100}
       >
         <Email/>
+      </WidgetFrame>
+      <WidgetFrame
+        x1={1}
+        y1={7}
+        x2={4}
+        y2={9}
+        minWidth={3}
+        minHeight={2}
+        resizeActive={false}
+        snapSize={100}
+      >
+        <Timer/>
       </WidgetFrame>
     </>
   );

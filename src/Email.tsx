@@ -4,7 +4,7 @@ import axios, { AxiosError } from 'axios';
 import { Button, Flex, For, Heading, Icon, LinkBox, LinkOverlay, ScrollArea, Stack, Text } from '@chakra-ui/react';
 import { LuMail } from 'react-icons/lu';
 
-import { AuthStatus } from '../types/AuthStatus.ts';
+import { AuthStatus } from '../types/WidgetStatus.ts';
 
 function Email () {
   const [authStatus, setAuthStatus] = useState(AuthStatus.SignedOut);

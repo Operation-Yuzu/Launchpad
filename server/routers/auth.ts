@@ -193,7 +193,8 @@ router.get('/checkauth/:widget', async (req: any, res) => {
     // TODO: refactor to use refresh tokens. Instead of deleting, refresh and replace the token
     validTokens.forEach(async token => {
       if (token.expiry_date < now) {
-        await prisma.googleToken.delete({where: {id: token.id}});
+        await prisma.googleToken.deleteMany({where: {id: token.id}}); // .delete() expects a single unique record to exist, and throws an error if it doesn't
+        // but because many widgets might be checking their auth status simultaneously, there's a possible race condition on deleting expired tokens
       } else {
         numValidTokens++;
       }

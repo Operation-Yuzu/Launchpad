@@ -7,7 +7,7 @@ import { LuCalendarDays } from 'react-icons/lu';
 
 
 import type { Event, CalendarObject } from '../types/Calendar.ts';
-import { AuthStatus } from '../types/AuthStatus.ts';
+import { AuthStatus } from '../types/WidgetStatus.ts';
 
 function Calendar() {
   const [authStatus, setAuthStatus] = useState(AuthStatus.SignedOut);

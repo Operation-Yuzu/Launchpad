@@ -36,7 +36,7 @@ dashboard.get('/all/:id', async (req, res) => {
   }
 });
 
-router.get('/:id', async (req, res) => {
+dashboard.get('/:id', async (req, res) => {
   // there should be some sort of auth here to check if the given dashboard
   // either belongs to the user or is public
 
@@ -161,7 +161,7 @@ dashboard.patch('/:id', async (req, res) => {
 });
 
 //This route should update layout used by a dashboard
-router.post('/:dashboardId/layout/:layoutId', async (req, res) => {
+dashboard.post('/:dashboardId/layout/:layoutId', async (req, res) => {
   const dashboardId = Number(req.params.dashboardId)
   const layoutId = Number(req.params.layoutId);
   const userId = 1; //TODO: add auth
