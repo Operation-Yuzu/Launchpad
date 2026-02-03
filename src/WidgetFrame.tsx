@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffectEvent, useEffect } from 'react';
 
 import { Container, For } from "@chakra-ui/react";
 
@@ -196,11 +196,13 @@ function CornerHandle({corner, parentWidth, parentHeight, resize, snap}: {corner
   );
 }
 
-function WidgetFrame({x1, y1, x2, y2, minWidth, minHeight, snapSize, resizeActive, children}: {x1: number, y1: number, x2: number, y2: number, minWidth: number, minHeight: number, snapSize: number, resizeActive: boolean, children?: React.ReactNode}) {
+function WidgetFrame({x1, y1, x2, y2, minWidth, minHeight, snapSize, resizeActive, handleResize, children}: {x1: number, y1: number, x2: number, y2: number, minWidth: number, minHeight: number, snapSize: number, resizeActive: boolean, handleResize?: (x1: number, y1: number, width: number, height: number) => void, children?: React.ReactNode}) {
   const [top, setTop] = useState(y1 * snapSize);
   const [bottom, setBottom] = useState(y2 * snapSize);
   const [left, setLeft] = useState(x1 * snapSize);
   const [right, setRight] = useState(x2 * snapSize);
+
+  const [hasSnapped, setHasSnapped] = useState(false);
 
   const minHeightPx = minHeight * snapSize;
   const minWidthPx = minWidth * snapSize;
@@ -224,6 +226,8 @@ function WidgetFrame({x1, y1, x2, y2, minWidth, minHeight, snapSize, resizeActiv
   };
 
   const snap = (side: Side) => {
+    setHasSnapped(true); // make sure the effect event to pass the new size and location to the parent fires
+
     // You really need the state update functions here
     // I tried to just set all the state variables directly - it didn't work
     // It always snapped back to their original positions
@@ -270,6 +274,30 @@ function WidgetFrame({x1, y1, x2, y2, minWidth, minHeight, snapSize, resizeActiv
         break;
     }
   };
+
+  const onSnap = useEffectEvent(() => {
+    if (!hasSnapped) {
+      return;
+    } else {
+      const newTopCoor = top / snapSize;
+      const newBottomCoor = bottom / snapSize;
+      const newLeftCoor = left / snapSize;
+      const newRightCoor = right / snapSize;
+
+      const newWidth = newRightCoor - newLeftCoor;
+      const newHeight = newBottomCoor - newTopCoor;
+
+      if (handleResize) {
+        handleResize(newLeftCoor, newTopCoor, newWidth, newHeight);
+      }
+
+      setHasSnapped(false); // this will trigger a second render but hopefully *only* one
+    }
+  });
+
+  useEffect(() => {
+    onSnap();
+  }, [hasSnapped]);
 
   const renderResizeHandles = () => {
     if (resizeActive) {

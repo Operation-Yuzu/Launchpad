@@ -34,6 +34,7 @@ function Dashboard ({dashboardId}: {dashboardId: number}) {
         minWidth={2}
         minHeight={3}
         resizeActive={true}
+        handleResize={(x1, y1, width, height) => console.log(`Now ${width}x${height} with top left corner at (${x1}, ${y1})`)}
         snapSize={100}
       >
         <Calendar />
