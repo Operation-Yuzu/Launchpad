@@ -93,6 +93,7 @@ function SideHandle({side, parentWidth, parentHeight, resize, snap}: {side: Side
       padding="0px"
       onMouseDown={handleMouseDown}
       cursor={cursor}
+      userSelect="none"
     >
     </Container>
   );
@@ -191,6 +192,7 @@ function CornerHandle({corner, parentWidth, parentHeight, resize, snap}: {corner
       padding="0px"
       onMouseDown={handleMouseDown}
       cursor={cursor}
+      userSelect="none"
     >
     </Container>
   );
@@ -321,7 +323,7 @@ function WidgetFrame({x1, y1, x2, y2, minWidth, minHeight, snapSize, resizeActiv
   };
 
   return (
-    <Container padding="5" bg="blue" position="absolute" top={`${top}px`} left={`${left}px`} width={`${right-left}px`} height={`${bottom-top}px`} overflow="clip">
+    <Container padding="5" bg="blue" position="absolute" top={`${top}px`} left={`${left}px`} width={`${right-left}px`} height={`${bottom-top}px`} overflow="clip" userSelect={resizeActive ? "none" : "text"}>
       {children}
       {renderResizeHandles()}
     </Container>
