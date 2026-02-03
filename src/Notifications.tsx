@@ -1,9 +1,12 @@
 import axios from "axios";
 import { useState, useEffect} from 'react';
-import { Switch } from "@chakra-ui/react"
+import { Button, Switch, For } from "@chakra-ui/react"
+import { PinInput } from "@chakra-ui/react"
 
 function Notifications ({ownerId} : {ownerId: number}) {
 const [phoneNumber, setPhoneNumber] = useState('');
+const [hasNumber, setHasNumber] = useState(false)
+const [isAdding, setIsAdding] = useState(false)
 const [checked, setChecked] = useState(false)
 console.log(ownerId, 'here')
 console.log(phoneNumber)
@@ -11,20 +14,21 @@ console.log(phoneNumber)
 
 useEffect(() => {
   const getNumber = async () => {
-  
+
   try {
     const number = await axios.get(`/notifications/${ownerId}`)
 
-    if(number === undefined){
-      return (
-        <p> you have no phone number</p>
-      )
+    if(!number.data?.contactNumber){
+      setHasNumber(false)
+      setPhoneNumber('')
     } else {
       setPhoneNumber(number.data.contactNumber)
-      console.log(number)
+      setHasNumber(true)
     }
+
   } catch (error) {
     console.error('something went wrong with the number', error)
+    setHasNumber(false)
   }
 
 }
@@ -69,7 +73,40 @@ const deleteNumber = async () => {
 
   return (
     <div>
-      <p>{phoneNumber}</p>
+
+      {!hasNumber && !isAdding && (
+        <div>
+          <p>Notifications</p>
+          <button onClick={() => setIsAdding(true)}>Add Phone Number</button>
+        </div>
+      )}
+
+      {!hasNumber && isAdding && (
+        <div>
+          <p>Enter A Phone Number</p>
+          <For each={['sm']}>
+            {(size) => (
+            <PinInput.Root key={size} size={size}>
+              <PinInput.HiddenInput />
+              <PinInput.Control>
+                <PinInput.Input index={0} />
+                <PinInput.Input index={1} />
+                <PinInput.Input index={2} />
+                <PinInput.Input index={3} />
+                <PinInput.Input index={4} />
+                <PinInput.Input index={5} />
+                <PinInput.Input index={6} />
+                <PinInput.Input index={7} />
+                <PinInput.Input index={8} />
+                <PinInput.Input index={9} />
+              </PinInput.Control>
+            </PinInput.Root>
+            )}
+
+          </For>
+        </div>
+      )}
+      {/* <p>{phoneNumber}</p>
       <input type='tel' value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
       <button onClick={() => {
         if(phoneNumber.length > 0){
@@ -92,7 +129,7 @@ const deleteNumber = async () => {
           </Switch.Control>
           <Switch.Label />
         </Switch.Root>
-      <button onClick={() => deleteNumber()}>Delete Phone Number</button>
+      <button onClick={() => deleteNumber()}>Delete Phone Number</button> */}
     </div>
 
   )
