@@ -99,6 +99,44 @@ phoneNumbers.post('/verify/send/:ownerId', async (req, res) => {
   }
 })
 
+// verify the verification code
+phoneNumbers.post('/verify/check/:ownerId', async (req, res) => {
+  // gets the verification code they put in the field
+  try {
+    const { code } = req.body
+
+    if(!code){
+      res.status(404).send('Please enter the Verification code')
+    }
+
+    const existing = await prisma.phoneNumbers.findUnique({
+      where: {
+        userId: Number(req.params.ownerId)
+      }
+    })
+
+    if(!existing?.contactNumber){
+      res.status(404).send('Could not find your account')
+    }
+
+    const phone = existing?.contactNumber as string
+    const verificationCheck = await client.verify.v2.services("VA7937e5f669dd205b29a3a78482ad9b64")
+    .verificationChecks.create({
+      to: phone,
+      code
+    })
+
+    if(verificationCheck.status === 'approved'){
+      res.status(201).send({verified: true})
+    } else {
+      res.status(404).send({verified: false})
+    }
+  } catch (error) {
+    res.status(500).send({'something went wrong with verifying the verification code' : error})
+
+  }
+})
+
 
 
 
