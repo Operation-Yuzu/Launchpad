@@ -86,7 +86,7 @@ const deleteNumber = async () => {
           <p>Enter A Phone Number</p>
           <For each={['sm']}>
             {(size) => (
-            <PinInput.Root key={size} size={size}>
+            <PinInput.Root key={size} size={size} onValueChange={(e) => setPhoneNumber(e.valueAsString)}>
               <PinInput.HiddenInput />
               <PinInput.Control>
                 <PinInput.Input index={0} />
