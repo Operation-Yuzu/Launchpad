@@ -13,6 +13,7 @@ function Timer() {
   const [timerString, setTimerString] = useState('');
   const [pausedRemaining, setPausedRemaining] = useState(null as number | null);
   const [tickTimeout, setTickTimeout] = useState(null as null | number);
+  const [timerTimeout, setTimerTimeout] = useState(null as null | number);
 
   // check timer, assign states
   const checkServer = async () => {
@@ -162,15 +163,28 @@ function Timer() {
         console.error('Unknown action:', action);
         break;
     }
+  };
+
+  const handleTimeUp = () => {
+    console.log('Timer is up!');
+    checkServer();
   }
 
   const resetClockDisplay = useEffectEvent(() => {
     stopTicking();
+
+    if (timerTimeout !== null) {
+      clearTimeout(timerTimeout);
+    }
+
     if (expiration !== null) {
+      const remainingMs = expiration.getTime() - Date.now();
+      setTimerTimeout(setTimeout(handleTimeUp, remainingMs));
       setTimerString(expiresToString(expiration));
       startTicking();
     } else if (pausedRemaining !== null) {
-      setTimerString(timeToString(pausedRemaining))
+      setTimerString(timeToString(pausedRemaining));
+      setTimerTimeout(null);
     }
   });
 
