@@ -193,7 +193,7 @@ function Timer() {
             <Text marginBottom="0.5rem">Start a timer:</Text>
             <Flex justify="center" gap="0.5rem">
               <For
-                each={[5, 25, 45]}
+                each={[1, 5, 25, 45]}
               >
                 {(time) => {
                   return (
