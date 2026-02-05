@@ -12,7 +12,7 @@ const [code, setCode] = useState('')
 const [checked, setChecked] = useState(false)
 const [verificationStatus, setVerificationStatus] = useState(false)
 console.log(ownerId, 'here')
-console.log(checked)
+console.log(phoneNumber)
 // so i need to get the number
 
 useEffect(() => {
@@ -20,18 +20,17 @@ useEffect(() => {
 
   try {
     const number = await axios.get(`/notifications/${ownerId}`)
-
+    console.log(number, 'this is number')
     if(!number.data){
       setHasNumber(false)
-      setPhoneNumber('')
       setChecked(false)
       return;
       
     }
-
+    console.log(number, 'this time its number')
     setHasNumber(true)
-    setPhoneNumber(number.data.contactNumber)
-    setChecked(number.data.notifications)
+    setPhoneNumber(number.data.data.contact)
+    setChecked(number.data.data.noti)
     
 
   } catch (error) {
@@ -203,6 +202,10 @@ const deleteNumber = async () => {
           </Switch.Control>
           <Switch.Label />
         </Switch.Root>
+        <p>Phone Number: *** - *** - {String(phoneNumber)}</p>
+
+
+        <button onClick={() => deleteNumber()}>Delete Phone Number</button>
         </div>
       )}
       {/* <p>{phoneNumber}</p>
@@ -229,7 +232,7 @@ const deleteNumber = async () => {
           <Switch.Label />
         </Switch.Root>
       <button onClick={() => deleteNumber()}>Delete Phone Number</button> */}
-      <button onClick={() => deleteNumber()}>Delete Phone Number</button>
+      
       
     </div>
 

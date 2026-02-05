@@ -3,6 +3,7 @@ import express from 'express';
 import { prisma } from '../database/prisma.js';
 import "dotenv/config";
 import twilio from 'twilio'
+import { use } from 'passport';
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client = twilio(accountSid, authToken);
@@ -22,11 +23,14 @@ phoneNumbers.get('/:ownerId', async (req, res) => {
     if(!userNumber){
       return res.status(404).send('Could not find your account')
     }
-
-     console.log(Number(req.params.ownerId))
+    console.log(userNumber, 'in server')
+    const data = {
+      contact: userNumber.contactNumber,
+      noti: userNumber.notifications
+    }
+    // console.log(Number(req.params.ownerId))
     return res.status(200).send({
-      contactNumber: userNumber?.contactNumber,
-      notifications: userNumber?.notifications
+      data
     })
   } catch (error) {
     return res.status(500).send({'Could not fetch the phone number': error})
