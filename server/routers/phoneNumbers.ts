@@ -219,7 +219,7 @@ phoneNumbers.patch('/verify/:ownerId', async (req, res) => {
 // PATCH - need to make it to where if they want to change the number, they can
 // but also if they click a button or verify those fields are changed too
 phoneNumbers.patch('/:ownerId', async (req, res) => {
-  const { notifications, contactNumber} = req.body
+  const { contactNumber} = req.body
   try {
     const existing = await prisma.phoneNumbers.findUnique({
       where: {
@@ -242,6 +242,7 @@ phoneNumbers.patch('/:ownerId', async (req, res) => {
     if(contactNumber){
       data.contactNumber = contactNumber
       data.verified = false
+      data.notifications = false
     }
 
     // if something is clicked change the boolean value
@@ -249,9 +250,6 @@ phoneNumbers.patch('/:ownerId', async (req, res) => {
     //   data.verified = verified
     // }
 
-    if(typeof notifications === 'boolean'){
-      data.notifications = notifications
-    }
 
     const status = await prisma.phoneNumbers.update({
       where: {

@@ -11,9 +11,9 @@ const [step, setStep] = useState('phone') // will tell what component to render
 const [code, setCode] = useState('')
 const [checked, setChecked] = useState(false)
 const [verificationStatus, setVerificationStatus] = useState(false)
-console.log(ownerId, 'here')
-console.log(phoneNumber)
-// so i need to get the number
+
+
+console.log(isAdding, step, hasNumber, 'ehehehehe')
 
 useEffect(() => {
   const getNumber = async () => {
@@ -78,12 +78,12 @@ const checkVerification = async () => {
   }
 }
 // update the number
-const updateNumber = async (notifications?: any) => {
+const updateNumber = async () => {
 
-  setChecked(notifications)
+
   try {
-    await axios.patch(`/notifications/${ownerId}`, {contactNumber: phoneNumber, notifications: notifications})
-    setChecked(!notifications)
+    await axios.patch(`/notifications/${ownerId}`, {contactNumber: phoneNumber})
+
 
     console.log('success')
   } catch (error) {
@@ -122,7 +122,7 @@ const deleteNumber = async () => {
         </div>
       )}
 
-      {!hasNumber && isAdding && step === 'phone' && (
+      {(!hasNumber && isAdding && step === 'phone') || (hasNumber && isAdding && step === 'phone') && (
         <div>
           <p>Enter A Phone Number</p>
           <For each={['sm']}>
@@ -149,8 +149,13 @@ const deleteNumber = async () => {
               // if no phone number was added, return them to the place to enter a phone number
               return;
             }
-            // add the phone number
-            await addNumber();
+
+            if(hasNumber){
+              await updateNumber()
+            } else {
+              // add the phone number
+              await addNumber();
+            }
             await sendVerification();
             setStep('verify')
           }}>Send Verification Code</Button>
@@ -204,36 +209,14 @@ const deleteNumber = async () => {
           <Switch.Label />
         </Switch.Root>
         <p>Phone Number: *** - *** - {phoneNumber.slice(8)}</p>
-
-        <button onClick={() => deleteNumber()}>Delete Phone Number</button>
+        <Button onClick={async () => {
+          setIsAdding(true)
+          setCode('')
+          setStep('phone')
+        }}>Update Phone Number</Button>
+        <Button onClick={() => deleteNumber()}>Delete Phone Number</Button>
         </div>
       )}
-      {/* <p>{phoneNumber}</p>
-      <input type='tel' value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
-      <button onClick={() => {
-        if(phoneNumber.length > 0){
-         addNumber()
-        }
-        
-      }}>Save Phone Number</button>
-      <p>Update Phone Number</p>
-      <input type='tel' value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
-      <button onClick={() => {
-        if(phoneNumber.length > 0){
-         updateNumber()
-        }
-      }}>Save Phone Number</button>
-      <p> Notifications </p>
-        <Switch.Root checked={checked} onCheckedChange={updateNumber}>
-          <Switch.HiddenInput />
-          <Switch.Control>
-            <Switch.Thumb />
-          </Switch.Control>
-          <Switch.Label />
-        </Switch.Root>
-      <button onClick={() => deleteNumber()}>Delete Phone Number</button> */}
-      
-      
     </div>
 
   )
