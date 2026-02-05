@@ -202,7 +202,7 @@ function OpenEditDash(dashboardId: number) {
             </HStack>
           </VStack>
 
-          {/* Defaults + Connected Accounts */}
+          {/* Defaults + Notifications + Connected Accounts */}
           <HStack align="stretch" gap={6} mb={6}>
             {/* Defaults */}
             <Box
@@ -424,7 +424,32 @@ function OpenEditDash(dashboardId: number) {
                 </VStack>
               )}
             </Box>
-
+              {/* Notifications */}
+            <Box
+              flex="1"
+              border="1px solid"
+              borderColor="gray.600"
+              borderRadius="lg"
+              p={4}
+              maxH="230px"
+              overflowY="auto"
+            >
+              <Text fontWeight="bold" mb={3}>
+                Notifications
+              </Text>
+              <VStack gap={3}>
+                  <HStack
+                    w="100%"
+                    p={2}
+                    border="1px solid"
+                    borderColor="gray.600"
+                    borderRadius="md"
+                  >
+                  {/* do stuff here azaria*/}
+                  <Text>Put Your Component Here</Text>
+                  </HStack>
+              </VStack>
+            </Box>
             {/* Connected Accounts */}
             <Box
               flex="1"
@@ -468,7 +493,6 @@ function OpenEditDash(dashboardId: number) {
               </VStack>
             </Box>
           </HStack>
-
           {/* Dashboards */}
           <Box
             border="1px solid"
