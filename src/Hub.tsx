@@ -150,13 +150,6 @@ export default function Hub({
     }
   };
 
-
-  // used to send user to edit page for selected dashboard
-  // TODO coordinate with dashboard editor team to finish this function
-  const handleEdit = async (dashboardId: number) => {
-
-  };
-
   // used to set a dashboard's layout as public
   // TODO coordinate with layout team to finish function
   const handlePublishLayout = () => {};
