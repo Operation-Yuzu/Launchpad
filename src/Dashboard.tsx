@@ -8,8 +8,30 @@ import Calendar from './Calendar';
 import Email from './Email';
 import Timer from './Timer';
 
+
+
+
+type Layout = {
+  id: number;
+  gridSize: string;
+  layoutElements: LayoutElement[];
+};
+
+type LayoutElement = {
+  id: number;
+  posX: number;
+  posY: number;
+  sizeX: number;
+  sizeY: number;
+};
+
+type Dashboard = {
+  name: string;
+  layout: Layout;
+};
+
 function Dashboard ({dashboardId}: {dashboardId: number}) {
-  const [dashboard, setDashboard] = useState({name: "Loading"});
+  const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const loadDashboard = async () => {
     try {
       const response = await axios.get(`/dashboard/${dashboardId}`);
@@ -23,12 +45,15 @@ function Dashboard ({dashboardId}: {dashboardId: number}) {
     loadDashboard();
   }, []);
 
+    if (!dashboard) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <>
       <h2>{dashboard.name}</h2>
       <Link to='/edit'>Edit</Link>
-      
-      <LayoutCanvas>
+      <LayoutCanvas layout={dashboard.layout}>
       <WidgetFrame
         posX={1}
         posY={1}
