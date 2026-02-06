@@ -18,18 +18,17 @@ account.get('/', async (req, res) => {
       {
         name: 'Google',
         unlinkable: false, // because the whole Launchpad account is attached to your Google account
+        unlinkURL: '/unlink/google',
         permissions: [
           {
             name: 'Calendar',
             authorized: (google?.authCalendar ? true : false),
-            authURL: '/auth/calendar',
-            revokeURL: '/revoke/calendar'
+            authURL: '/auth/calendar'
           },
           {
             name: 'Gmail',
             authorized: (google?.authGmail ? true : false),
-            authURL: '/auth/gmail',
-            revokeURL: '/revoke/gmail'
+            authURL: '/auth/gmail'
           }
         ]
       }
