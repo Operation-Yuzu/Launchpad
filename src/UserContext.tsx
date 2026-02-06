@@ -9,11 +9,21 @@ type ClientUser = {
 }
 
 export const UserContext = createContext({
-  user: {id: -1} as ClientUser
+  user: {id: -1} as ClientUser,
+  handleLogout: () => {}
 });
 
 function UserProvider ({children}: {children?: React.ReactNode}) {
   const [user, setUser] = useState({id: -1} as ClientUser);
+
+  const handleLogout = async () => {
+    try {
+      await axios.post('/logout');
+      getUser();
+    } catch (error) {
+      console.error('Failed to log out:', error);
+    }
+  }
 
   const getUser = async () => {
     try {
@@ -33,7 +43,7 @@ function UserProvider ({children}: {children?: React.ReactNode}) {
   }, []);
 
   return (
-    <UserContext value={{user}}>
+    <UserContext value={{user, handleLogout}}>
       {children}
     </UserContext>
   );
