@@ -51,7 +51,14 @@ export default function Hub(
   const [dashboards, setDashboards] = useState([] as any[]);
   const [schedules, setSchedules] = useState([] as any[]);
 
-  const { user: {id: ownerId, primaryDashId}, activeDash, setActiveDash: handleDashboardSelection, getPrimaryDash: refreshPrimaryDash } = useContext(UserContext);
+  const { user: {id: ownerId, primaryDashId: primaryDashIdContext}, activeDash, setActiveDash: handleDashboardSelection, getPrimaryDash: refreshPrimaryDash } = useContext(UserContext);
+
+  const [primaryDashId, setPrimaryDashId] = useState(primaryDashIdContext); // the context value is the 'real' value. PrimaryDashId is a local value used to track which value is selected in the scheduler
+
+  useEffect(() => {
+    setPrimaryDashId(primaryDashIdContext); // if the value in the context changes (such as by triggering a refresh, update the local value to match)
+  }, [primaryDashIdContext]);
+
   const navigate = useNavigate();
 
     /**
@@ -296,7 +303,7 @@ function OpenEditDash(dashboardId: number) {
                       value={primaryDashId ?? ""}
                       onChange={(e) => { 
                         const value = Number(e.target.value)
-                        handleSetDefault(value)}} 
+                        setPrimaryDashId(value)}} 
                       style={{ minWidth: "200px" }}
                       aria-disabled={primaryDashId !== null && !editingAlways}
                       pointerEvents={

@@ -5,11 +5,11 @@ import axios from 'axios';
 type ClientUser = {
   id: number,
   name?: string,
-  primaryDashId?: number
+  primaryDashId: number | null
 }
 
 export const UserContext = createContext({
-  user: {id: -1} as ClientUser,
+  user: {id: -1, primaryDashId: null} as ClientUser,
   activeDash: -1,
   handleLogout: () => {},
   setActiveDash: (n: number) => {},
@@ -49,8 +49,8 @@ function UserProvider ({children}: {children?: React.ReactNode}) {
       // this might trigger rerenders of anything that depends on id anyway...
       setUser(u => {
         return {
-          primaryDashId: response.data,
-          ...u
+          ...u,
+          primaryDashId: response.data
         }
       });
     } catch (error) {
