@@ -3,23 +3,38 @@ import { Link } from "react-router";
 import axios from 'axios';
 import Theme from './Theme';
 import LayoutGallery from './LayoutGallery';
+import LayoutCanvas from './LayoutCanvas'
 
 type Layout = {
   id: number;
   gridSize: string;
-  layoutElements: [];
+  layoutElements: LayoutElement[];
+};
 
+type LayoutElement = {
+  id: number;
+  posX: number;
+  posY: number;
+  sizeX: number;
+  sizeY: number;
+  widget: {
+    name: string
+  }
 };
 
 type Dashboard = {
   id: number;
   name: string;
+  layout: Layout
+  ownerId: number;
   layoutId: number | null;
 };
 
 
+
+
 function DashEditor({dashboardId, ownerId}: {dashboardId: number, ownerId: number}) {
-  const [dashboard, setDashboard] = useState({name: "Loading", ownerId: -1});
+  const [dashboard, setDashboard] = useState<Dashboard | null>(null); /*useState({name: "Loading", ownerId: -1})*/;
   const [newName, setNewName] = useState('');
   const [renaming, setRenaming] = useState(false);
   const [selectedLayoutId, setSelectedLayoutId] = useState(-1);//(-1 = nothing selected)
@@ -33,6 +48,24 @@ function DashEditor({dashboardId, ownerId}: {dashboardId: number, ownerId: numbe
 
   // const [userId, setUserId] = useState(ownerId);
 
+  //Will load layout when selectedLayoutId changes
+  useEffect(() => {
+    if(selectedLayoutId === -1){
+      return;
+    }
+
+    axios.get(`/layout/${selectedLayoutId}`)
+    .then((res) => {
+      setSelectedLayout(res.data);
+
+    }).catch((err) => {
+      console.log('Could not find your layout:', err);
+    });
+  }, [selectedLayoutId]);
+
+  useEffect(() => {
+    loadDashboard();
+  }, []);
 
   const loadDashboard = async () => {
     try {
@@ -44,6 +77,13 @@ function DashEditor({dashboardId, ownerId}: {dashboardId: number, ownerId: numbe
       console.error('Failed to get dashboard:', error);
     }
   };
+
+    if (!dashboard) {
+    console.log("No dashboard")
+    return <div>
+      Loading
+    </div>;
+  }
 
   const renameDashboard = async () => {
     if (newName === dashboard.name) {
@@ -70,24 +110,6 @@ function DashEditor({dashboardId, ownerId}: {dashboardId: number, ownerId: numbe
     setNewName(dashboard.name);
   }
 
-  useEffect(() => {
-    loadDashboard();
-  }, []);
-
-  //Will load layout when selectedLayoutId changes
-  useEffect(() => {
-    if(selectedLayoutId === -1){
-      return;
-    }
-
-    axios.get(`/layout/${selectedLayoutId}`)
-    .then((res) => {
-      setSelectedLayout(res.data);
-
-    }).catch((err) => {
-      console.log('Could not find your layout:', err);
-    });
-  }, [selectedLayoutId]);
 
   //Will create a clone of applied layout
   const applyLayout = async (layoutId: number) => {
@@ -122,6 +144,8 @@ function DashEditor({dashboardId, ownerId}: {dashboardId: number, ownerId: numbe
     }
   };
 
+
+
   return (
     <>
       <h2>Editing: {renderName()}</h2>
@@ -135,6 +159,7 @@ function DashEditor({dashboardId, ownerId}: {dashboardId: number, ownerId: numbe
       <Link to='/'>Done</Link>
       <Theme dashboardId={dashboardId} dashboard={dashboard} ownerId={ownerId} />
       <LayoutGallery onSelect={setSelectedLayoutId}/>
+      <LayoutCanvas layout={dashboard.layout} editable />
 
       {selectedLayout && (
         <>

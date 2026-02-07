@@ -23,15 +23,16 @@ type LayoutElement = {
   }
 };
 
-type Dash = {
+type Dashboard = {
+  id: number;
   name: string;
-  layout: Layout;
+  layout: Layout
 };
 
 
 
 function Dashboard ({dashboardId}: {dashboardId: number}) {
-  const [dashboard, setDashboard] = useState<Dash | null>(null);
+  const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const loadDashboard = async () => {
     try {
       const response = await axios.get(`/dashboard/${dashboardId}`);
@@ -46,7 +47,10 @@ function Dashboard ({dashboardId}: {dashboardId: number}) {
   }, []);
 
     if (!dashboard) {
-    return <div>Loading...</div>;
+    console.log("No dashboard")
+    return <div>
+      Loading
+    </div>;
   }
 
   return (

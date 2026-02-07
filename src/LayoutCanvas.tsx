@@ -35,7 +35,7 @@ const gridRows = 12;
 const snapSize = 200;
 
 
-const LayoutCanvas = function({layout}: { layout: Layout  }){
+const LayoutCanvas = function({layout, editable=false}: { layout: Layout; editable?: boolean }){
   return (
     <Box
     //Anchors absolute widgets
@@ -69,7 +69,7 @@ const LayoutCanvas = function({layout}: { layout: Layout  }){
         minWidth={1}
         minHeight={1}
         snapSize={snapSize}
-        resizeActive={true}
+        resizeActive={editable}
         >
         <WidgetComp />
         </WidgetFrame>
