@@ -34,6 +34,11 @@ function UserProvider ({children}: {children?: React.ReactNode}) {
       const response = await axios.get('/user');
       if (response.data.id) {
         setUser(response.data as ClientUser);
+
+        // id the user has selected a primary dash, that's the first one that should be accessed
+        if (response.data.primaryDashId) {
+          setActiveDash(response.data.primaryDashId);
+        }
       } else {
         setUser({id: -1} as ClientUser);
       }
