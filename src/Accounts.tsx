@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Accordion, Button, Flex, For, VStack, Text } from '@chakra-ui/react';
+import { Accordion, Button, Flex, For, Spacer, Text, VStack } from '@chakra-ui/react';
 
 import axios from 'axios';
 
@@ -36,15 +36,26 @@ function Accounts() {
         {(account) => (
           <Accordion.Item value={account.name}>
             <Accordion.ItemTrigger>
-              <Accordion.ItemIndicator />
-              {account.name}
-              <Button asChild size="2xs" rounded="full">
-                {
-                  account.unlinkable
-                    ? <a href={account.unlinkURL}>Unlink</a>
-                    : <a href="" data-disabled="" onClick={(e) => e.preventDefault()} >Unlink</a>
-                }
-              </Button>
+              <Flex
+                width="100%"
+                align="center"
+                px={2}
+                py={4}
+                border="1px solid"
+                borderColor="gray.600"
+                borderRadius="md"
+              >
+                <Accordion.ItemIndicator />
+                <Text mx="2">{account.name}</Text>
+                <Spacer />
+                <Button asChild size="2xs" rounded="full">
+                  {
+                    account.unlinkable
+                      ? <a href={account.unlinkURL}>Unlink</a>
+                      : <a href="" data-disabled="" onClick={(e) => e.preventDefault()} >Unlink</a>
+                  }
+                </Button>
+              </Flex>
             </Accordion.ItemTrigger>
             <Accordion.ItemContent>
               <Accordion.ItemBody>
@@ -53,8 +64,9 @@ function Accounts() {
                     each={account.permissions}
                   >
                     {(permission) => (
-                      <Flex justify="space-between">
+                      <Flex width="100%" px={2}>
                         <Text>{permission.name}</Text>
+                        <Spacer />
                         <Button asChild size="2xs" rounded="full" colorPalette="green" variant={permission.authorized ? "outline" : undefined}>
                           {
                             permission.authorized
