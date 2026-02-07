@@ -1,13 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Link } from "react-router";
 import axios from 'axios';
+
+import { UserContext } from './UserContext';
 
 import WidgetFrame from './WidgetFrame';
 import Calendar from './Calendar';
 import Email from './Email';
 import Timer from './Timer';
 
-function Dashboard ({dashboardId}: {dashboardId: number}) {
+function Dashboard () {
+  const { activeDash: dashboardId } = useContext(UserContext);
+
   const [dashboard, setDashboard] = useState({name: "Loading"});
   const loadDashboard = async () => {
     try {
@@ -20,7 +24,7 @@ function Dashboard ({dashboardId}: {dashboardId: number}) {
 
   useEffect(() => {
     loadDashboard();
-  }, []);
+  }, [dashboardId]);
 
   return (
     <>

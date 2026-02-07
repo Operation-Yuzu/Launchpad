@@ -10,11 +10,15 @@ type ClientUser = {
 
 export const UserContext = createContext({
   user: {id: -1} as ClientUser,
-  handleLogout: () => {}
+  activeDash: -1,
+  handleLogout: () => {},
+  setActiveDash: (n: number) => {},
+  getPrimaryDash: () => {}
 });
 
 function UserProvider ({children}: {children?: React.ReactNode}) {
   const [user, setUser] = useState({id: -1} as ClientUser);
+  const [activeDash, setActiveDash] = useState(-1);
 
   const handleLogout = async () => {
     try {
@@ -38,12 +42,34 @@ function UserProvider ({children}: {children?: React.ReactNode}) {
     }
   };
 
+  const getPrimaryDash = async () => {
+    try {
+      const response = await axios.get(`/dashboard/primary/${user.id}`);
+      // update only the primaryDashId property
+      // this might trigger rerenders of anything that depends on id anyway...
+      setUser(u => {
+        return {
+          primaryDashId: response.data,
+          ...u
+        }
+      });
+    } catch (error) {
+      console.error('Failed to get user\'s primary dash:', error);
+    }
+  };
+
   useEffect(() => {
     getUser();
   }, []);
 
   return (
-    <UserContext value={{user, handleLogout}}>
+    <UserContext value={{
+      user,
+      activeDash,
+      handleLogout,
+      setActiveDash,
+      getPrimaryDash
+    }}>
       {children}
     </UserContext>
   );
