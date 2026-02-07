@@ -14,7 +14,7 @@ import { useState, useEffect} from 'react';
 import Color from './ColorPicker';
 import axios from 'axios';
 import { ColorSwatch } from "@chakra-ui/react"
-import { Box } from "@chakra-ui/react"
+import { Box, Button} from "@chakra-ui/react"
 import { Listbox, createListCollection } from "@chakra-ui/react"
 function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, ownerId: number}, ownerId: number, dashboardId : number}) {
   const [themesList, setThemesList] = useState([] as {id: number, navColor: string, bgColor: string, font: string}[]);
@@ -99,11 +99,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
   }, [dashboard.ownerId])
 
   return (
-    <div>
-      <Box bg={currTheme.navColor}> Hello
-        <Box bg={currTheme.bgColor}> Hello </Box>
-        <Box bg={currTheme.font}> Hello </Box>
-      </Box>
+    <Box>
     {
       <Listbox.Root collection={allThemesList} width="320px">
       <Listbox.Label>Select Theme</Listbox.Label>
@@ -122,20 +118,20 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
     }
       <form>
         <label>navColor</label>
-        <div id='navColor'>
+        <Box id='navColor'>
           <Color onValueChange={colorPicker(setNavColorPick)} />
-        </div>
+        </Box>
         <label>bgColor</label>
-        <div id='bgColor'>
+        <Box id='bgColor'>
           <Color onValueChange={colorPicker(setBgColorPick)}/>
-        </div>
+        </Box>
         <label>font</label>
-        <div id='font'>
+        <Box id='font'>
           <Color onValueChange={colorPicker(setFontPick)}/>
-        </div>
+        </Box>
       </form>
-      <button onClick={createTheme}>CREATE</button>
-    </div>
+      <Button onClick={createTheme}>CREATE</Button>
+    </Box>
   )
 }
 
