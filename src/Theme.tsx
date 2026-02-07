@@ -10,7 +10,7 @@
  */
 
 
-import { useState, useEffect} from 'react';
+import { useState, useEffect, use} from 'react';
 import Color from './ColorPicker';
 import axios from 'axios';
 import { ColorSwatch } from "@chakra-ui/react"
@@ -27,6 +27,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
   const [activeDash, setActiveDash] = useState({id: -1, navColor: 'string', bgColor: 'string', font: 'string'});
   const [currTheme, setCurrTheme] = useState(activeDash);
   // first lets get all the themes of that user
+  console.log(currTheme, 'CURRENTTT')
   const allThemes = async () => {
 
     try {
@@ -90,6 +91,17 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
     itemToValue: (item) => item.id.toString()
   })
 
+ // deleting the theme
+  const deleteTheme = async (data: any) => {
+    try {
+      const {themeId} = data
+      await axios.delete(`/theme/delete/${ownerId}`, {data: {themeId}})
+      allThemes()
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   useEffect(() => {
     // if the owner is provided
     if(dashboard.ownerId){
@@ -98,6 +110,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
     }
   }, [dashboard.ownerId])
 
+
   return (
     <Box>
     {
@@ -105,6 +118,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
       <Listbox.Label>Select Theme</Listbox.Label>
       <Listbox.Content>
         {allThemesList.items.map((theme) => (
+          <Box>
           <Listbox.Item item={theme} key={theme.id} onClick={() => {
             setCurrTheme(theme)
             updateTheme({themeId: theme.id})
@@ -112,6 +126,10 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
             <Listbox.ItemText> navColor: <ColorSwatch value={theme.navColor}/> bgColor: <ColorSwatch value={theme.bgColor}/> font: <ColorSwatch value={theme.font}/></Listbox.ItemText>
             <Listbox.ItemIndicator />
           </Listbox.Item>
+          <Button onClick={() => {
+            deleteTheme({themeId: theme.id})
+            }}> Delete </Button>
+          </Box>
         ))}
       </Listbox.Content>
     </Listbox.Root>
