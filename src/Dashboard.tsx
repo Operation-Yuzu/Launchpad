@@ -9,17 +9,41 @@ import Timer from './Timer';
 
 function Dashboard ({dashboardId}: {dashboardId: number}) {
   const [dashboard, setDashboard] = useState({name: "Loading"});
+  const [themeId, setThemeId] = useState(-1)
+  const [themeObject, setThemeObject] = useState({})
+  console.log(dashboard, 'dashboard')
+  console.log(themeObject, 'should be the whole theme object')
   const loadDashboard = async () => {
     try {
       const response = await axios.get(`/dashboard/${dashboardId}`);
       setDashboard(response.data);
+      setThemeId(response.data.themeId)
     } catch (error) {
       console.error('Failed to get dashboard:', error);
     }
   };
 
+  // find the theme that matches the theme id stuff
+  const settingTheme = async () => {
+    try {
+      const currentTheme = await axios.get(`/theme/theme/${themeId}`)
+      console.log(currentTheme, 'currentTheme')
+      if(!currentTheme){
+        console.error('could not get theme')
+      }
+      setThemeObject(currentTheme.data)
+    } catch (error) {
+      console.error('Failed to get theme:', error);
+    }
+  }
+
+  useEffect(() => {
+    settingTheme()
+  }, [themeId])
+
   useEffect(() => {
     loadDashboard();
+
   }, []);
 
   return (
