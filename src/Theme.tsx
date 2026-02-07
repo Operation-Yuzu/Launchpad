@@ -100,10 +100,6 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
 
   return (
     <Box>
-      <Box bg={currTheme.navColor}> Hello
-        <Box bg={currTheme.bgColor}> Hello </Box>
-        <Box bg={currTheme.font}> Hello </Box>
-      </Box>
     {
       <Listbox.Root collection={allThemesList} width="320px">
       <Listbox.Label>Select Theme</Listbox.Label>

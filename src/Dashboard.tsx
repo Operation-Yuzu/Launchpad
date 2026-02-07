@@ -9,6 +9,7 @@ import Calendar from './Calendar';
 import Email from './Email';
 import Timer from './Timer';
 import type { ThemeObject } from '../types/Calendar';
+import { Box } from '@chakra-ui/react';
 
 function Dashboard ({dashboardId}: {dashboardId: number}) {
   const [dashboard, setDashboard] = useState({name: "Loading"});
@@ -50,8 +51,8 @@ function Dashboard ({dashboardId}: {dashboardId: number}) {
   }, []);
 
   return (
-    <>
-      <NavBar pages={["Home", "Hub"]} />
+    <Box bg={themeObject.bgColor} minH='100vh' w='100%'>
+      <NavBar pages={["Home", "Hub"]} color={themeObject.navColor}/>
       <h2>{dashboard.name}</h2>
       <Link to='/edit'>Edit</Link>
       <WidgetFrame
@@ -94,7 +95,7 @@ function Dashboard ({dashboardId}: {dashboardId: number}) {
       >
         <Timer/>
       </WidgetFrame>
-    </>
+    </Box>
   );
 }
 

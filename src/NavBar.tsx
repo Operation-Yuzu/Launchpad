@@ -8,13 +8,14 @@ import { LuRocket } from "react-icons/lu"
 
 interface MyProps {
   pages: Array<string>,
+  color?: string
 }
 
 function NavBar (props: MyProps) {
 
   return (
     <div style={{position: "sticky", top: "0", zIndex: "200"}}>
-      <Container as="div" w="100%" h="45px" backgroundColor="gray.emphasized" margin="0" maxWidth="none" paddingLeft="64" paddingRight="64">
+      <Container as="div" w="100%" h="45px" backgroundColor={props.color ?? "gray.emphasized"} margin="0" maxWidth="none" paddingLeft="64" paddingRight="64" >
         {/* TODO: Make this responsive for mobile and turn into a collapsible thing */}
         <For each={props.pages}>
           {(page) => (
