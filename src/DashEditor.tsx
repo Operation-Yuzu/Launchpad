@@ -1,6 +1,7 @@
 import { useState, useEffect, type ChangeEvent } from 'react';
 import { Link } from "react-router";
 import axios from 'axios';
+import NavBar from "./NavBar";
 import Theme from './Theme';
 import LayoutGallery from './LayoutGallery';
 import LayoutCanvas from './LayoutCanvas'
@@ -148,6 +149,7 @@ function DashEditor({dashboardId, ownerId}: {dashboardId: number, ownerId: numbe
 
   return (
     <>
+      <NavBar pages={["Home", "Hub"]} />
       <h2>Editing: {renderName()}</h2>
       {appliedDash?.layoutId && (
         <section>

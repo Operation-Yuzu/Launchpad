@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link } from "react-router";
 import axios from 'axios';
 
+import NavBar from "./NavBar";
+
 import LayoutCanvas from './LayoutCanvas'
 
 
@@ -55,6 +57,7 @@ function Dashboard ({dashboardId}: {dashboardId: number}) {
 
   return (
     <>
+      <NavBar pages={["Home", "Hub"]} />
       <h2>{dashboard.name}</h2>
       <Link to='/edit'>Edit</Link>
       <LayoutCanvas
