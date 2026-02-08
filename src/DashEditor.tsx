@@ -1,6 +1,8 @@
-import { useState, useEffect, type ChangeEvent } from 'react';
+import { useState, useEffect, useContext, type ChangeEvent } from 'react';
 import { Link } from "react-router";
 import axios from 'axios';
+
+import { UserContext } from './UserContext';
 import NavBar from "./NavBar";
 import Theme from './Theme';
 import LayoutGallery from './LayoutGallery';
@@ -33,9 +35,11 @@ type Dashboard = {
 
 
 
+function DashEditor() {
+  const { activeDash: dashboardId, user: { id: ownerId } } = useContext(UserContext);
+  const [dashboard, setDashboard] = useState<Dashboard | null>(null);
 
-function DashEditor({dashboardId, ownerId}: {dashboardId: number, ownerId: number}) {
-  const [dashboard, setDashboard] = useState<Dashboard | null>(null); /*useState({name: "Loading", ownerId: -1})*/;
+
   const [newName, setNewName] = useState('');
   const [renaming, setRenaming] = useState(false);
   const [selectedLayoutId, setSelectedLayoutId] = useState(-1);//(-1 = nothing selected)
@@ -112,6 +116,26 @@ function DashEditor({dashboardId, ownerId}: {dashboardId: number, ownerId: numbe
   }
 
 
+  useEffect(() => {
+    loadDashboard();
+  }, [dashboardId]);
+
+  //Will load layout when selectedLayoutId changes
+  useEffect(() => {
+    if(selectedLayoutId === -1){
+      return;
+    }
+
+    axios.get(`/layout/${selectedLayoutId}`)
+    .then((res) => {
+      setSelectedLayout(res.data);
+
+    }).catch((err) => {
+      console.log('Could not find your layout:', err);
+    });
+  }, [selectedLayoutId]);
+
+
   //Will create a clone of applied layout
   const applyLayout = async (layoutId: number) => {
     try {
@@ -126,7 +150,7 @@ function DashEditor({dashboardId, ownerId}: {dashboardId: number, ownerId: numbe
       console.error('Failed to use layout:', error);
     }
 
-   }
+  }
 
 
   const renderName = () => {
@@ -158,7 +182,7 @@ function DashEditor({dashboardId, ownerId}: {dashboardId: number, ownerId: numbe
           {/**MVP GRID PLACEHOLDER */}
         </section>
       )}
-      <Link to='/'>Done</Link>
+      <Link to='/Dashboard'>Done</Link>
       <Theme dashboardId={dashboardId} dashboard={dashboard} ownerId={ownerId} />
       <LayoutGallery onSelect={setSelectedLayoutId}/>
       <LayoutCanvas layout={dashboard.layout} editable />

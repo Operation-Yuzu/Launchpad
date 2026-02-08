@@ -70,6 +70,7 @@ const LayoutCanvas = function({layout, editable=false}: { layout: Layout; editab
         minHeight={1}
         snapSize={snapSize}
         resizeActive={editable}
+        color='#e5e7eb'
         >
         <WidgetComp />
         </WidgetFrame>
