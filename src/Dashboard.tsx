@@ -58,6 +58,7 @@ function Dashboard () {
       <h2>{dashboard.name}</h2>
       <Link to='/edit'>Edit</Link>
       <WidgetFrame
+        widgetId={1}
         posX={1}
         posY={1}
         sizeX={5}
@@ -65,13 +66,14 @@ function Dashboard () {
         minWidth={2}
         minHeight={3}
         resizeActive={true}
-        handleResize={(posX, posY, width, height) => console.log(`Now ${width}x${height} with top left corner at (${posX}, ${posY})`)}
+        handleResize={(widgetId, posX, posY, width, height) => console.log(`Widget ${widgetId} now ${width}x${height} with top left corner at (${posX}, ${posY})`)}
         snapSize={100}
         color={themeObject.font}
       >
         <Calendar />
       </WidgetFrame>
       <WidgetFrame
+        widgetId={2}
         posX={7}
         posY={1}
         sizeX={5}
@@ -85,6 +87,7 @@ function Dashboard () {
         <Email/>
       </WidgetFrame>
       <WidgetFrame
+        widgetId={3}
         posX={1}
         posY={7}
         sizeX={3}
