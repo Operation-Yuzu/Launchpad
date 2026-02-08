@@ -5,12 +5,12 @@ import axios from 'axios';
 
 type ClientUser = {
   id: number,
-  name?: string,
+  name: string,
   primaryDashId: number | null
 }
 
 export const UserContext = createContext({
-  user: {id: -1, primaryDashId: null} as ClientUser,
+  user: {id: -1, name: 'Not signed in', primaryDashId: null} as ClientUser,
   activeDash: -1,
   handleLogout: () => {},
   setActiveDash: (n: number) => {},
@@ -43,7 +43,7 @@ function UserProvider ({children}: {children?: React.ReactNode}) {
           setActiveDash(response.data.primaryDashId);
         }
       } else {
-        setUser({id: -1} as ClientUser);
+        setUser({id: -1, name: 'Not signed in', primaryDashId: null} as ClientUser);
       }
     } catch (error) {
       console.error('Failed to get user:', error);
