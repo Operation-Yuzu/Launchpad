@@ -20,6 +20,7 @@ import {
 import { UserContext } from "./UserContext";
 import NavBar from "./NavBar";
 import Notifications from "./Notifications";
+import Accounts from "./Accounts";
 
 type ScheduleDraft = {
   id: string; // backend schedule.id once saved, temporary UUID before saving
@@ -494,6 +495,7 @@ function OpenEditDash(dashboardId: number) {
               <Text fontWeight="bold" mb={3}>
                 Connected Accounts
               </Text>
+              <Accounts />
               <VStack gap={3}>
                 {[1, 2, 3, 4, 5].map((i) => (
                   <HStack
