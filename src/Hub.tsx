@@ -496,34 +496,6 @@ function OpenEditDash(dashboardId: number) {
                 Connected Accounts
               </Text>
               <Accounts />
-              <VStack gap={3}>
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <HStack
-                    key={i}
-                    w="100%"
-                    p={2}
-                    border="1px solid"
-                    borderColor="gray.600"
-                    borderRadius="md"
-                  >
-                    <Box
-                      w="32px"
-                      h="32px"
-                      border="1px solid"
-                      borderColor="gray.600"
-                      borderRadius="md"
-                    />
-                    <Text flex="1">Username</Text>
-                    <Box
-                      w="32px"
-                      h="20px"
-                      border="1px solid"
-                      borderColor="gray.600"
-                      borderRadius="full"
-                    />
-                  </HStack>
-                ))}
-              </VStack>
             </Box>
           </HStack>
           {/* Dashboards */}
