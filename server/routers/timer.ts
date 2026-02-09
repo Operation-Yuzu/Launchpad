@@ -2,12 +2,45 @@ import express from 'express';
 
 import { prisma } from '../database/prisma.js';
 
+import "dotenv/config";
+import twilio from 'twilio'
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const client = twilio(accountSid, authToken);
+
 const timerLookup: {[key: string]: NodeJS.Timeout} = {};
 
 const timer = express.Router();
 
 const timerCallback = async (userId: number) => {
   console.info(`User ${userId}'s timer is up.`);
+
+  // check if user has a phone number - verified - notifications are true
+  // if so send the message - if not throw error
+
+  
+    
+      const userNumber = await prisma.phoneNumbers.findUnique({
+        where: {
+          userId: userId
+        }
+      })
+      console.log(userNumber, userId, 'TIMER TESTING')
+      if(userNumber){
+        if(userNumber.verified === true && userNumber.notifications === true){
+          try {await client.messages.create({
+            body: "Timer is up!",
+            from: "+18336574381",
+            to: userNumber.contactNumber,
+          });
+        } catch (error) {
+          console.error(error, 'something went wrong when sending message with timer ending')
+        }
+        }
+      }
+
+    
+  
 
   await prisma.timer.deleteMany({where: {
     ownerId: userId
@@ -29,7 +62,13 @@ timer.get('/', async (req, res) => {
     if (timer === null) {
       res.status(200).send(null);
     } else {
-      res.status(200).send(timer)
+      // need to send in terms of remainingMs, regardless of whether timer is paused or not, because there's no guarantee that the client and server clocks are synced
+      const timerData = {
+        paused: timer.paused,
+        remainingMs: timer.paused ? timer.remainingMs : (timer.expiresAt as Date).getTime() - Date.now()
+      }
+
+      res.status(200).send(timerData)
     }
   } catch (error) {
     console.error('Failed to GET user\'s timer:', error);
@@ -154,9 +193,9 @@ timer.patch('/resume', async (req, res) => {
           remainingMs: null,
           expiresAt
         }
-      })
+      });
 
-      res.status(200).send(expiresAt);
+      res.status(200).send((expiresAt as Date).getTime() - Date.now());
     }
   } catch (error) {
     console.error('Failed to resume user\'s timer:', error);
