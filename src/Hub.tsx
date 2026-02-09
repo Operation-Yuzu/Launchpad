@@ -224,7 +224,7 @@ function OpenEditDash(dashboardId: number) {
               borderColor="gray.600"
               borderRadius="md"
             >
-              <Text>{username}</Text>
+              <Text>Signed in as: {username}</Text>
             </Box>
           </VStack>
 
