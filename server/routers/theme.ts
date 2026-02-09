@@ -12,7 +12,7 @@ theme.get('/theme/:themeId', async (req, res) => {
         id: Number(req.params.themeId)
       }
     })
-
+    console.log(currentTheme)
     if(!currentTheme){
       return res.status(404).send('No theme was found')
     }
