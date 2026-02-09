@@ -159,7 +159,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
         </Box>
       </form>
       <Button size='2xs' variant='surface' colorPalette='blue' onClick={createTheme}>CREATE</Button>
-      <Button size='2xs' variant='surface' colorPalette='blue' onClick={() => {
+      <Button size='2xs' variant='ghost' colorPalette='blue' onClick={() => {
         if(currTheme.id !== -1){
           updateTheme({
             themeId: currTheme.id,
@@ -171,7 +171,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
         } else {
           console.error('Select a theme')
         }
-      }}>Update Current Theme</Button>
+      }}></Button>
       </Box>
     </Box>
   )
