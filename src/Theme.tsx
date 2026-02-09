@@ -16,6 +16,9 @@ import axios from 'axios';
 import { ColorSwatch } from "@chakra-ui/react"
 import { Box, Button, Text } from "@chakra-ui/react"
 import { Listbox, createListCollection } from "@chakra-ui/react"
+
+
+
 function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, ownerId: number}, ownerId: number, dashboardId : number}) {
   const [themesList, setThemesList] = useState([] as {id: number, navColor: string, bgColor: string, font: string}[]);
 

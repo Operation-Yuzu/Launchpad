@@ -6,7 +6,7 @@ import { UserContext } from './UserContext';
 import LayoutCanvas from './LayoutCanvas'
 import NavBar from "./NavBar";
 import axios from 'axios';
-
+import changeTextColor from './utilities/color.ts'
 
 
 
@@ -67,6 +67,10 @@ function Dashboard () {
     }
   }
 
+  // for the text color
+  const textColor = changeTextColor(themeObject.bgColor)
+
+
   useEffect(() => {
     settingTheme()
   }, [themeId])
@@ -83,8 +87,8 @@ function Dashboard () {
   }
 
   return (
-    <Box bg={themeObject.bgColor} minH='100vh' w='100%'>
-      <NavBar pages={["Home", "Hub"]} color={themeObject.navColor}/>
+    <Box bg={themeObject.bgColor} color={textColor} minH='100vh' w='100%'>
+      <NavBar pages={["Home", "Hub"]} textColor={textColor} navColor={themeObject.navColor}/>
       <h2>{dashboard.name}</h2>
       <Link to='/edit'>Edit</Link>
       <LayoutCanvas
