@@ -584,7 +584,7 @@ function OpenEditDash(dashboardId: number) {
                                   size="sm"
                                   variant="ghost"
                                   justifyContent="flex-start"
-                                  onClick={handlePublishLayout}
+                                  onClick={(e) => { e.stopPropagation(); handlePublishLayout() }}
                                 >
                                   Publish Layout
                                 </Button>
@@ -593,7 +593,7 @@ function OpenEditDash(dashboardId: number) {
                                   size="sm"
                                   variant="ghost"
                                   justifyContent="flex-start"
-                                  onClick={handlePublishTheme}
+                                  onClick={(e) => { e.stopPropagation(); handlePublishTheme() }}
                                 >
                                   Publish Theme
                                 </Button>
@@ -603,7 +603,7 @@ function OpenEditDash(dashboardId: number) {
                                   variant="ghost"
                                   justifyContent="flex-start"
                                   color="red.500"
-                                  onClick={() => handleDelete(dashboard.id)}
+                                  onClick={(e) => { e.stopPropagation(); handleDelete(dashboard.id) }}
                                 >
                                   Delete
                                 </Button>
