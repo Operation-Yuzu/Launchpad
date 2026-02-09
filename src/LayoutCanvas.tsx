@@ -32,7 +32,7 @@ const widgetMap: Record<string, React.FC>= {
 const gridCols = 19;
 const gridRows = 12;
 //px per grid unit
-const snapSize = 200;
+const snapSize = 100;
 
 
 const LayoutCanvas = function({layout, editable=false}: { layout: Layout; editable?: boolean }){
@@ -44,7 +44,7 @@ const LayoutCanvas = function({layout, editable=false}: { layout: Layout; editab
     width={`${gridCols * snapSize}px`}
     height={`${gridRows * snapSize}px`}
     border="2px solid rgb(400, 255, 255)"
-    backgroundColor="black"
+    backgroundColor="transparent"
     //Snaps grid to units
     backgroundSize={`${snapSize}px ${snapSize}px`}
     //Actual grid lines
