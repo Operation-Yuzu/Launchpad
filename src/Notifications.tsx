@@ -1,7 +1,10 @@
 import axios from "axios";
 import { useState, useEffect} from 'react';
-import { Button, Switch, For, Text, Box, Flex, Spacer} from "@chakra-ui/react"
+import { Button, Switch, For, Text, Box, Flex, Spacer, Center, HStack} from "@chakra-ui/react"
 import { PinInput } from "@chakra-ui/react"
+import { IoCall } from "react-icons/io5";
+
+
 
 function Notifications ({ownerId} : {ownerId: number}) {
 const [phoneNumber, setPhoneNumber] = useState('');
@@ -68,6 +71,7 @@ const sendVerification = async () => {
 const checkVerification = async () => {
   try {
     const verification = await axios.post(`/notifications/verify/check/${ownerId}`, {code})
+
     setVerificationStatus(verification.data)
     return {verified : true}
   } catch (error) {
@@ -120,21 +124,23 @@ const deleteNumber = async () => {
     <Box  w='100%'>
 
       {!hasNumber && !isAdding && (
-        <Box>
-          <Button placeContent='center' size="xs" variant="surface" colorPalette="blue" onClick={() => setIsAdding(true)}>Add Phone Number</Button>
-        </Box>
+        <Center>
+          <Button placeContent='center' size='xs' variant='ghost' colorPalette='blue' onClick={() => setIsAdding(true)}>{<IoCall />} Add Phone Number</Button>
+        </Center>
       )}
 
       {(isAdding && step === 'phone') && (
         <Box>
-          <Text>Enter A Phone Number</Text>
+          <Center>
+          <Text fontWeight='medium'>Enter A Phone Number</Text>
+          </Center>
           <For each={['2xs']}>
             {(size) => (
             <PinInput.Root key={size} size={size} onValueChange={(e) => setPhoneNumber(e.valueAsString)}>
               <PinInput.HiddenInput />
               <PinInput.Control >
-                <Box gap='1'>
-                <PinInput.Input index={0} placeholder='X'/>
+                <Box gap='1' >
+                <PinInput.Input index={0} placeholder='X' />
                 <PinInput.Input index={1} placeholder='X' />
                 <PinInput.Input index={2} placeholder='X' />
                 </Box>
@@ -155,7 +161,8 @@ const deleteNumber = async () => {
             </PinInput.Root>
             )}
           </For>
-          <Button placeContent='center' size="xs" variant="surface" colorPalette="blue" onClick={async () => {
+          <Center mt='1'>
+          <Button  placeContent='center' size="xs" variant="surface" colorPalette="blue" onClick={async () => {
             if(!phoneNumber || phoneNumber.length !== 10){
               // if no phone number was added, return them to the place to enter a phone number
               return;
@@ -169,28 +176,37 @@ const deleteNumber = async () => {
             }
             await sendVerification();
             setStep('verify')
-          }}>Send Verification Code</Button>
+          }}>Send Code</Button>
+          </Center>
 
         </Box>
       )}
+
+
+      
       {step === 'verify' && (
         <Box>
+          <Center>
           <Text fontWeight="medium" >Enter Verification Code</Text>
+          </Center>
+          <Center>
           <For each={['sm']}>
             {(size) => (
             <PinInput.Root key={size} size={size} onValueChange={(e) => setCode(e.valueAsString)}>
               <PinInput.HiddenInput />
               <PinInput.Control>
-                <PinInput.Input index={0} placeholder='X' />
-                <PinInput.Input index={1} placeholder='X' />
-                <PinInput.Input index={2} placeholder='X' />
-                <PinInput.Input index={3} placeholder='X' />
-                <PinInput.Input index={4} placeholder='X' />
+                <PinInput.Input index={0} placeholder='X'/>
+                <PinInput.Input index={1} placeholder='X'/>
+                <PinInput.Input index={2} placeholder='X'/>
+                <PinInput.Input index={3} placeholder='X'/>
+                <PinInput.Input index={4} placeholder='X'/>
                 <PinInput.Input index={5} placeholder='X'/>
               </PinInput.Control>
             </PinInput.Root>
             )}
           </For>
+          </Center>
+          <Center mt='1'>
           <Button placeContent='center' size="xs" variant="surface" colorPalette="blue" onClick={async () => {
             const verified = await checkVerification()
             console.log(verified, 'this is verified on click')
@@ -199,17 +215,55 @@ const deleteNumber = async () => {
               setHasNumber(true)
               setIsAdding(false)
               // step it back to the phone part
+              setVerificationStatus(true)
               setStep('phone')
               setCode('')
             } else {
               // code do a pop out error, or make it read border flash
               console.log('Wrong Code')
             }
-          }}>Verify Code</Button>
+          }}>Verify</Button>
+          </Center>
         </Box>
       )}
 
-      {hasNumber && (
+
+      {hasNumber && verificationStatus === false && step !== 'verify' && !isAdding &&  (
+        // so if the user clicks off the verification code step
+        // they will have a number but they cannot enable notifications until they verify the number
+        <Box  w='100%'>
+        <Flex justify='space-between' align='center' mb='3' w='100%'>
+          
+        <Text fontWeight="medium"> Notifications </Text>
+        <Spacer />
+        <Switch.Root disabled colorPalette="blue" checked={checked}  onCheckedChange={(e) => updateNotifications(e.checked)}>
+          <Switch.HiddenInput />
+          <Switch.Control>
+            <Switch.Thumb />
+          </Switch.Control>
+          <Switch.Label />
+        </Switch.Root>
+        </Flex>
+        <Text fontWeight="medium" mb='4' >Phone Number: XXX - XXX - {phoneNumber.slice(8)}</Text>
+        <Flex justify='space-between' align='center' mb='3'>
+        <Button size="xs" variant="surface" colorPalette="blue" onClick={async () => {
+          setIsAdding(true)
+          setCode('')
+          setStep('phone')
+        }}>Update Phone Number</Button>
+        <Button onClick={async () => {
+          setStep('verify')
+          await sendVerification()
+        }}>Verify Number</Button>
+        </Flex>
+        <Button size="2xs" variant="surface" colorPalette="red" onClick={() => deleteNumber()}> Delete </Button>
+        </Box>
+      )}
+
+
+
+
+      {hasNumber && verificationStatus === true && isAdding === false &&  (
         <Box  w='100%'>
         <Flex justify='space-between' align='center' mb='3' w='100%'>
           
