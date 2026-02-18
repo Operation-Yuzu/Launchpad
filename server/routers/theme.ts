@@ -12,7 +12,7 @@ theme.get('/theme/:themeId', async (req, res) => {
         id: Number(req.params.themeId)
       }
     })
-
+    console.log(currentTheme)
     if(!currentTheme){
       return res.status(404).send('No theme was found')
     }
@@ -80,8 +80,7 @@ theme.post('/', async (req, res) => {
 theme.patch('/', async (req, res) => {
   // need to insert information
   // console.log(req)
-  const { public: isPublic, navColor, bgColor, font, ownerId} = req.body as {public: boolean, navColor: string, bgColor: string, font: string, ownerId: number}
-  const {id} = req.body;
+  const { id, public: isPublic, navColor, bgColor, font, ownerId} = req.body as {id: number, public: boolean, navColor: string, bgColor: string, font: string, ownerId: number}
   try {
     await prisma.theme.update({
       where: {

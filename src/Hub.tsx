@@ -20,6 +20,7 @@ import {
 import { UserContext } from "./UserContext";
 import NavBar from "./NavBar";
 import Notifications from "./Notifications";
+import Accounts from "./Accounts";
 
 type ScheduleDraft = {
   id: string; // backend schedule.id once saved, temporary UUID before saving
@@ -197,11 +198,6 @@ export default function Hub(
     navigate("/dashboard", { replace: true })
   };
 
-// used to open dashboard editor for selected dashboard
-function OpenEditDash(dashboardId: number) {
-  handleDashboardSelection(dashboardId);
-  navigate("/edit", { replace: true })
-}
 
   return (
     <>
@@ -210,13 +206,13 @@ function OpenEditDash(dashboardId: number) {
         <Box w="100%" maxW="1400px" p={6}>
           {/* Profile */}
           <VStack gap={3} mb={6}>
-            <Box
+            {/* <Box
               w="96px"
               h="96px"
               borderRadius="full"
               border="1px solid"
               borderColor="gray.600"
-            />
+            /> */}
             <Box
               px={4}
               py={1}
@@ -224,7 +220,7 @@ function OpenEditDash(dashboardId: number) {
               borderColor="gray.600"
               borderRadius="md"
             >
-              <Text>{username}</Text>
+              <Text>Signed in as: {username}</Text>
             </Box>
           </VStack>
 
@@ -489,34 +485,7 @@ function OpenEditDash(dashboardId: number) {
               <Text fontWeight="bold" mb={3}>
                 Connected Accounts
               </Text>
-              <VStack gap={3}>
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <HStack
-                    key={i}
-                    w="100%"
-                    p={2}
-                    border="1px solid"
-                    borderColor="gray.600"
-                    borderRadius="md"
-                  >
-                    <Box
-                      w="32px"
-                      h="32px"
-                      border="1px solid"
-                      borderColor="gray.600"
-                      borderRadius="md"
-                    />
-                    <Text flex="1">Username</Text>
-                    <Box
-                      w="32px"
-                      h="20px"
-                      border="1px solid"
-                      borderColor="gray.600"
-                      borderRadius="full"
-                    />
-                  </HStack>
-                ))}
-              </VStack>
+              <Accounts />
             </Box>
           </HStack>
           {/* Dashboards */}
@@ -576,15 +545,7 @@ function OpenEditDash(dashboardId: number) {
                                   size="sm"
                                   variant="ghost"
                                   justifyContent="flex-start"
-                                  onClick={() => OpenEditDash(dashboard.id)}
-                                >
-                                  Edit
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  justifyContent="flex-start"
-                                  onClick={handlePublishLayout}
+                                  onClick={(e) => { e.stopPropagation(); handlePublishLayout() }}
                                 >
                                   Publish Layout
                                 </Button>
@@ -593,7 +554,7 @@ function OpenEditDash(dashboardId: number) {
                                   size="sm"
                                   variant="ghost"
                                   justifyContent="flex-start"
-                                  onClick={handlePublishTheme}
+                                  onClick={(e) => { e.stopPropagation(); handlePublishTheme() }}
                                 >
                                   Publish Theme
                                 </Button>
@@ -603,7 +564,7 @@ function OpenEditDash(dashboardId: number) {
                                   variant="ghost"
                                   justifyContent="flex-start"
                                   color="red.500"
-                                  onClick={() => handleDelete(dashboard.id)}
+                                  onClick={(e) => { e.stopPropagation(); handleDelete(dashboard.id) }}
                                 >
                                   Delete
                                 </Button>

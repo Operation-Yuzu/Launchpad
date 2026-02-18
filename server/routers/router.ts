@@ -12,6 +12,8 @@ import timer from './timer.js';
 import phoneNumbers from './phoneNumbers.js';
 import dashboard from './dashboard.js';
 import schedule from './schedule.js';
+import accounts from './accounts.js';
+import github from './github.js';
 
 const router = express.Router();
 
@@ -24,6 +26,8 @@ router.use('/user', user);
 router.use('/email', email);
 router.use('/timer', timer);
 router.use('/notifications', phoneNumbers);
+router.use('/accounts', accounts);
+router.use('/github', github);
 
 // router.post('/create', async (req, res) => {
 //   const { name }: { name: string} = req.body;
