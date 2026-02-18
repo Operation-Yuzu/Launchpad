@@ -43,16 +43,15 @@ const LayoutCanvas = function({layout, editable=false}: { layout: Layout; editab
     //Defines grid bounds
     width={`${gridCols * snapSize}px`}
     height={`${gridRows * snapSize}px`}
-    border="2px solid rgb(400, 255, 255)"
+    border={editable ? "2px solid #e5e7eb" : "none"}
     backgroundColor="transparent"
     //Snaps grid to units
     backgroundSize={`${snapSize}px ${snapSize}px`}
     //Actual grid lines
     backgroundImage={editable? `
         linear-gradient(to right, #e5e7eb 1px, transparent 2px),
-        linear-gradient(to bottom, #e5e7eb 2px, transparent 2px)
-      ` :  `linear-gradient(to right, transparent 1px, 1px, transparent 1px),
-      linear-gradient(to bottom, transparent 1px, transparent 1px)`}
+        linear-gradient(to bottom, #e5e7eb 1px, transparent 2px)
+      ` :  "none"}
     >
       {layout.layoutElements.map((element) => {
       const WidgetComp = widgetMap[element.widget.name];
