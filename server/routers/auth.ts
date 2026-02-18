@@ -104,7 +104,7 @@ router.get('/auth/:widget', (req, res) => {
   req.session.state = state;
   
   const authorizationUrl = oauth2Client.generateAuthUrl({
-    access_type: 'online', // do I need offline?
+    access_type: 'offline', // do I need offline?
     scope: scopes[toAuthenticate],
     include_granted_scopes: true,
     state: state
@@ -136,9 +136,13 @@ router.get('/auth/redirect/google', async (req, res) => {
     res.end('State mismatch. Possible CSRF attack');
   } else {
     const { tokens } = await oauth2Client.getToken(query.code as string);
+
+    console.log(tokens);
+
     oauth2Client.setCredentials(tokens);
 
     let authCalendar = false, authGmail = false, authProfile = false;
+    let refresh_token = null, refresh_expiry_date = null;
 
     // TODO: deal with the rest of the scopes
     if (tokens.scope?.includes('profile')) {
@@ -153,19 +157,32 @@ router.get('/auth/redirect/google', async (req, res) => {
       authGmail = true;
     }
 
+    if (tokens.refresh_token) {
+      refresh_token = tokens.refresh_token;
+
+      refresh_expiry_date = new Date((tokens as any).refresh_token_expires_in * 1000 + Date.now());
+
+      // if (Object.hasOwn(tokens, 'refresh_token_expires_in')) {
+      //   refresh_expiry_date = tokens.refresh_token_expires_in;
+
+      // }
+    }
+
     await prisma.googleToken.create({
       data: {
         accountId: req.user.id,
         access_token: tokens.access_token as string,
         id_token: tokens.id_token as string,
         expiry_date: new Date(tokens.expiry_date as number),
+        refresh_token,
+        refresh_expiry_date,
         authProfile,
         authCalendar,
         authGmail
       }
     });
 
-    res.redirect('/');
+    res.redirect('/hub');
   }
 
 });
