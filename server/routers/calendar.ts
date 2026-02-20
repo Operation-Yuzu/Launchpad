@@ -68,7 +68,7 @@ router.get('/', async (req, res) => {
     res.status(200).send(events);
 
   } catch (error) {
-    if ((error as any).status === 403) { // this should be some kind of Gaxios thing
+    if ((error as any).status === 401) { // this should be some kind of Gaxios thing
       // token is invalid somehow (maybe revoked manually in Google settings?)
       // delete and send error to client
       await prisma.googleToken.deleteMany({
@@ -114,7 +114,7 @@ router.get('/list', async (req, res) => {
       res.status(200).send(items);
     }
   } catch (error) {
-    if ((error as any).status === 403) { // this should be some kind of Gaxios thing
+    if ((error as any).status === 401) { // this should be some kind of Gaxios thing
       // token is invalid somehow (maybe revoked manually in Google settings?)
       // delete and send error to client
       await prisma.googleToken.deleteMany({
