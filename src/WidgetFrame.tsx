@@ -198,7 +198,46 @@ function CornerHandle({corner, parentWidth, parentHeight, resize, snap}: {corner
   );
 }
 
-function WidgetFrame({widgetId, posX, posY, sizeX, sizeY, minWidth, minHeight, snapSize, resizeActive, handleResize, children, color}: {widgetId: number, posX: number, posY: number, sizeX: number, sizeY: number, minWidth: number, minHeight: number, snapSize: number, resizeActive: boolean, handleResize?: (widgetId: number, posX: number, posY: number, width: number, height: number) => void, children?: React.ReactNode, color: string}) {
+function DragHandle({parentWidth, parentHeight, move, snap}: {parentWidth: number, parentHeight: number, move: (deltaX: number, deltaY: number) => void, snap: () => void}) {
+
+  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    event.stopPropagation(); // keep the 'drag image' thing from happening
+    window.addEventListener('mousemove', handleMove);
+    window.addEventListener('mouseup', handleMouseUp);
+  };
+
+  const handleMove = (event: MouseEvent) => {
+    const deltaX = event.movementX;
+    const deltaY = event.movementY;
+
+    move(deltaX, deltaY);
+  };
+
+  const handleMouseUp = () => {
+    window.removeEventListener('mousemove', handleMove);
+    window.removeEventListener('mouseup', handleMouseUp);
+
+    snap();
+  };
+
+  return (
+    <Container
+      bgColor="green"
+      position="absolute"
+      top={`${handleThickness}px`}
+      left={`${handleThickness}px`}
+      width={`${parentWidth-2*handleThickness}px`}
+      height={`${parentHeight-2*handleThickness}px`}
+      padding="0px"
+      onMouseDown={handleMouseDown}
+      cursor="move"
+      userSelect="none"
+    >
+    </Container>
+  );
+}
+
+function WidgetFrame({widgetId, posX, posY, sizeX, sizeY, minWidth, minHeight, snapSize, editActive, handleResize, children, color}: {widgetId: number, posX: number, posY: number, sizeX: number, sizeY: number, minWidth: number, minHeight: number, snapSize: number, editActive: boolean, handleResize?: (widgetId: number, posX: number, posY: number, width: number, height: number) => void, children?: React.ReactNode, color: string}) {
   const [top, setTop] = useState(posY * snapSize);
   const [bottom, setBottom] = useState((posY + sizeY) * snapSize);
   const [left, setLeft] = useState(posX * snapSize);
@@ -227,7 +266,7 @@ function WidgetFrame({widgetId, posX, posY, sizeX, sizeY, minWidth, minHeight, s
     }
   };
 
-  const snap = (side: Side) => {
+  const snapSide = (side: Side) => {
     setHasSnapped(true); // make sure the effect event to pass the new size and location to the parent fires
 
     // You really need the state update functions here
@@ -277,6 +316,16 @@ function WidgetFrame({widgetId, posX, posY, sizeX, sizeY, minWidth, minHeight, s
     }
   };
 
+  const move = (deltaX: number, deltaY: number) => {
+    console.log(deltaX, deltaY);
+    return;
+  }
+
+  const snapPosition = () => {
+    console.log('snap position');
+    return;
+  }
+
   const onSnap = useEffectEvent(() => {
     if (!hasSnapped) {
       return;
@@ -301,20 +350,21 @@ function WidgetFrame({widgetId, posX, posY, sizeX, sizeY, minWidth, minHeight, s
     onSnap();
   }, [hasSnapped]);
 
-  const renderResizeHandles = () => {
-    if (resizeActive) {
+  const renderHandles = () => {
+    if (editActive) {
       return (
         <>
           <For
             each={Object.values(Side)}
           >
-            {(item) => <SideHandle side={item} parentWidth={right-left} parentHeight={bottom-top} resize={resize} snap={snap}/>}
+            {(item) => <SideHandle side={item} parentWidth={right-left} parentHeight={bottom-top} resize={resize} snap={snapSide}/>}
           </For>
           <For
             each={Object.values(Corner)}
           >
-            {(item) => <CornerHandle corner={item} parentWidth={right-left} parentHeight={bottom-top} resize={resize} snap={snap}/>}
+            {(item) => <CornerHandle corner={item} parentWidth={right-left} parentHeight={bottom-top} resize={resize} snap={snapSide}/>}
           </For>
+          <DragHandle parentWidth={right-left} parentHeight={bottom-top} move={move} snap={snapPosition}/>
         </>
       );
     } else {
@@ -323,9 +373,9 @@ function WidgetFrame({widgetId, posX, posY, sizeX, sizeY, minWidth, minHeight, s
   };
 
   return (
-    <Container padding="5" bg="blue" position="absolute" top={`${top}px`} left={`${left}px`} width={`${right-left}px`} height={`${bottom-top}px`} overflow="clip" userSelect={resizeActive ? "none" : "text"} bgColor={color}>
+    <Container padding="5" bg="blue" position="absolute" top={`${top}px`} left={`${left}px`} width={`${right-left}px`} height={`${bottom-top}px`} overflow="clip" userSelect={editActive ? "none" : "text"} bgColor={color}>
       {children}
-      {renderResizeHandles()}
+      {renderHandles()}
     </Container>
   );
 }
