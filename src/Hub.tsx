@@ -41,7 +41,7 @@ const createDraft = (): ScheduleDraft => ({
   period: "AM",
   saved: false,
 });
-
+// TEST COMMENT
 export default function Hub(
  // TODO will be changed when App component is completed
 ) {
