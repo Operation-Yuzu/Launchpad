@@ -27,7 +27,7 @@ jobs:
           --health-retries 5
 
     env:
-      DATABASE_URL: "postgresql://${{ secrets.PG_USER }}:${{ secrets.PG_PASSWORD }}@localhost:5432/${{ secrets.PG_DB }}"
+      DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/launchpad"
       GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
       GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
       APP_SECRET: ${{ secrets.secret }}
