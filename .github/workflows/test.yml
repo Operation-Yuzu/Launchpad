@@ -27,6 +27,7 @@ jobs:
           --health-retries 5
 
     env:
+      NODE_ENV: test
       DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/launchpad"
       GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID || 'test' }}
       GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET || 'test' }}
