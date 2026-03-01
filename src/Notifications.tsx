@@ -259,7 +259,7 @@ const deleteNumber = async () => {
           setCode('')
           setStep('phone')
         }}>Update Phone Number</Button>
-        <Button onClick={async () => {
+        <Button size="xs" variant="ghost" colorPalette="blue" onClick={async () => {
           setStep('verify')
           await sendVerification()
           
