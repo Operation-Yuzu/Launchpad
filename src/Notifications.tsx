@@ -1,7 +1,6 @@
 import axios from "axios";
 import { useState, useEffect} from 'react';
-import { Button, Switch, For, Text, Box, Flex, Spacer, Center} from "@chakra-ui/react"
-import { PinInput, Icon } from "@chakra-ui/react"
+import { Button, Switch, For, Text, Box, Flex, Spacer, Center, PinInput} from "@chakra-ui/react"
 import { IoCall, IoTrashSharp, IoPencilSharp } from "react-icons/io5";
 import { IoCheckmark, IoCloseOutline } from "react-icons/io5";
 
