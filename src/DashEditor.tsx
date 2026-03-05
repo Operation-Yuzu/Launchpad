@@ -150,7 +150,16 @@ function DashEditor() {
     if (renaming) {
       return (
         <span>
-          <input onChange={handleChange} value={newName}/>
+          <input
+          onChange={handleChange}
+          value={newName}
+          style={{
+            color: "black",
+            backgroundColor: "white",
+            border: "1px solid #82de11",
+            padding: "4px"
+          }}
+          />
           <button onClick={renameDashboard}>Save</button>
           <button onClick={handleCancelRename}>Cancel</button>
         </span>
@@ -186,6 +195,7 @@ function DashEditor() {
             borderColor="gray.500"
             borderRadius="md"
             bg="white"
+            color="gray.800"
           >
             {/* SCALE CONTAINER */}
             <LayoutCanvas layout={dashboard.layout} editable  onLayoutChange={loadDashboard} />
