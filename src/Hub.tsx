@@ -223,7 +223,7 @@ export default function Hub(
 
   return (
     <>
-      <NavBar pages={["Home", "Dashboard"]} />{" "}
+      <NavBar pages={["Home", "Dashboard"]} navColor="#99450e"/>{" "}
       {/*empty string will take user to Home page*/}
       <Flex minH="100vh" justify="center">
         <Box w="100%" maxW="1800px" p={6}>

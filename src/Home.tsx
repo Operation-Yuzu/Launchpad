@@ -32,7 +32,7 @@ function Home () {
     if (user.id === -1) { // not logged in
       return (
         <>
-          <Heading color="gray.focusRing" > Join Us! </Heading>
+          <Heading color="#dba022" > Join Us! </Heading>
           <div>
             <Button className="button google" colorPalette="gray" variant="outline" margin="1" asChild><Link href="/login/federated/google">Sign in with Google</Link></Button>
           </div>
@@ -44,7 +44,7 @@ function Home () {
     } else { // logged in
       return (
         <>
-          <Heading color="gray.focusRing">Welcome, {user.name}!</Heading>
+          <Heading color="#dba022">Welcome, {user.name}!</Heading>
           <div>
             {
               // if there is no active dash set, send user to hub rather than to a nonexistent dashboard
@@ -64,7 +64,7 @@ function Home () {
   return (
     <>
       {/* Navbar */}
-      <NavBar pages={["Hub", "Dashboard"]}/>
+      <NavBar pages={["Hub", "Dashboard"]} navColor='#99450e'/>
 
       
 

@@ -8,7 +8,7 @@ import { useContext } from 'react';
 import { UserContext } from './UserContext';
 import { IoLogOutOutline } from "react-icons/io5";
 
-import rocketLogoURL from './assets/Launchpad_Logo_rocket.png';
+import rocketLogoURL from './assets/Launchpad_Logo_2_LIGHT.png';
 
 interface MyProps {
   pages: Array<string>,
