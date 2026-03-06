@@ -178,7 +178,25 @@ router.patch('/default', async (req, res) => {
   }
 
   try {
-    // TODO: check that the layout element exists and belongs to a layout owned by the requesting user
+    // check that the layout element exists
+    const layoutElement = await prisma.layoutElement.findUnique({
+      where: {
+        id: layoutElementId
+      },
+      include: {
+        layout: true
+      }
+    });
+
+    if (!layoutElement) {
+      return res.sendStatus(404);
+    }
+
+    // check that layout element belongs to a layout owned by the requesting user
+    const ownerId = layoutElement.layout.ownerId;
+    if (ownerId !== userId) {
+      return res.status(403);
+    }
 
     const widgetSettings = await prisma.widgetSettings.upsert({
       where: {
