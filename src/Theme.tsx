@@ -1,10 +1,10 @@
 
-import { useState, useEffect} from 'react';
+import { useState, useEffect, useContext} from 'react';
 import Color from './ColorPicker';
 import axios from 'axios';
 import { Box, Button, Text, Listbox, createListCollection } from "@chakra-ui/react"
 import { IoTrashSharp, IoPencilSharp, IoAddCircleOutline } from "react-icons/io5";
-
+import { UserContext } from './UserContext';
 
 
 function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, ownerId: number}, ownerId: number, dashboardId : number}) {
@@ -17,7 +17,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
   const [fontPick, setFontPick] = useState('#ff0000');
   const [activeDash, setActiveDash] = useState({id: -1, navColor: 'string', bgColor: 'string', font: 'string'});
   const [currTheme, setCurrTheme] = useState(activeDash);
-
+  const { setCurrentTheme } = useContext(UserContext);
 
   const allThemes = async () => {
     try {
@@ -126,12 +126,13 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
             setNavColorPick(theme.navColor)
             setBgColorPick(theme.bgColor)
             setFontPick(theme.font)
+            setCurrentTheme(theme)
             await axios.patch(`/dashboard/${dashboardId}`, { themeId: theme.id })
             await getTheDash();
           }}>
             <Listbox.ItemText w='full'>
             <Box w='full'>
-              <Box display='flex' h='60px' w='250px' mb='5' borderRadius='sm' overflow='hidden'>
+              <Box display='flex' h='60px' w='250px' mb='5' borderRadius='xs' overflow='hidden'>
               <Box flex='1' bg={theme.navColor} />
               <Box flex='1' bg={theme.bgColor} />
               <Box flex='1' bg={theme.font} />

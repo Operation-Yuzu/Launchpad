@@ -11,6 +11,8 @@ import LayoutGallery from './LayoutGallery';
 import LayoutCanvas from './LayoutCanvas'
 import WidgetLibrary from "./WidgetLibrary";
 
+
+
 type Layout = {
   id: number;
   gridSize: string;
@@ -47,7 +49,8 @@ const snapSize = 60;
 function DashEditor() {
   const { activeDash: dashboardId, user: { id: ownerId } } = useContext(UserContext);
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
-
+  const { currentTheme } = useContext(UserContext);
+  console.log(currentTheme, 'HELELLEOO CAN THIS THING WORK ')
 
   const [newName, setNewName] = useState('');
   const [renaming, setRenaming] = useState(false);
@@ -185,7 +188,7 @@ function DashEditor() {
             border="1px solid"
             borderColor="gray.500"
             borderRadius="md"
-            bg="white"
+            bg={currentTheme?.bgColor || "white"} // this is the background of the grid
           >
             {/* SCALE CONTAINER */}
             <LayoutCanvas layout={dashboard.layout} editable  onLayoutChange={loadDashboard} />
@@ -213,7 +216,7 @@ function DashEditor() {
             )}
 
             {selectedLayout && (
-              <Box mt={4}>
+              <Box mt={4} >
                 <h4>LAYOUT PREVIEW</h4>
                 <p>SELECTED LAYOUT #{selectedLayoutId}</p>
                 <p>GRID SIZE: {selectedLayout.gridSize}</p>
