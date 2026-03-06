@@ -11,32 +11,7 @@ import LayoutGallery from './LayoutGallery';
 import LayoutCanvas from './LayoutCanvas'
 import WidgetLibrary from "./WidgetLibrary";
 
-
-
-type Layout = {
-  id: number;
-  gridSize: string;
-  layoutElements: LayoutElement[];
-};
-
-type LayoutElement = {
-  id: number;
-  posX: number;
-  posY: number;
-  sizeX: number;
-  sizeY: number;
-  widget: {
-    name: string
-  }
-};
-
-type Dashboard = {
-  id: number;
-  name: string;
-  layout: Layout
-  ownerId: number;
-  layoutId: number | null;
-};
+import type { Layout, Dashboard } from '../types/LayoutTypes';
 
 const gridCols = 19;
 const gridRows = 12;
@@ -197,7 +172,7 @@ function DashEditor() {
             border="1px solid"
             borderColor="gray.500"
             borderRadius="xl"
-            bg="white"
+            bg={currentTheme?.bgColor || "white"} // this is the background of the grid
             color="gray.800"
             overflow="hidden"
           >
