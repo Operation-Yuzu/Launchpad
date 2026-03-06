@@ -1,6 +1,10 @@
-import { useState, useEffectEvent, useEffect } from 'react';
+import { useState, useEffectEvent, useEffect, useContext } from 'react';
 
 import { Container, For } from "@chakra-ui/react";
+import { UserContext } from './UserContext';
+
+
+
 
 const handleThickness = 10;
 
@@ -19,6 +23,7 @@ enum Corner {
 }
 
 function SideHandle({side, parentWidth, parentHeight, resize, snap}: {side: Side, parentWidth: number, parentHeight: number, resize: (side: Side, delta: number) => void, snap: (side: Side) => void}) {
+
   let posX, posY;
   let width, height;
   let cursor;
@@ -242,6 +247,7 @@ function WidgetFrame({widgetId, posX, posY, sizeX, sizeY, minWidth, minHeight, s
   const [bottom, setBottom] = useState((posY + sizeY) * snapSize);
   const [left, setLeft] = useState(posX * snapSize);
   const [right, setRight] = useState((posX + sizeX) * snapSize);
+  const { currentTheme } = useContext(UserContext);
 
   const [hasSnapped, setHasSnapped] = useState(false);
 
@@ -358,6 +364,8 @@ function WidgetFrame({widgetId, posX, posY, sizeX, sizeY, minWidth, minHeight, s
   }, [hasSnapped]);
 
   const renderHandles = () => {
+
+    
     if (editActive) {
       const parentWidth = right - left;
       const parentHeight = bottom - top;
@@ -393,7 +401,7 @@ function WidgetFrame({widgetId, posX, posY, sizeX, sizeY, minWidth, minHeight, s
       height={`${bottom - top}px`}
       overflow="clip"
       userSelect={editActive ? "none" : "text"}
-      bgColor={color}
+      bgColor={currentTheme?.font}
     >
       {editActive && onDelete && (
         <button
