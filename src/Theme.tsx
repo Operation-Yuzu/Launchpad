@@ -132,10 +132,16 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
           }}>
             <Listbox.ItemText w='full'>
             <Box w='full'>
-            <Box display='flex' h='60px' w='250px' mb='5' borderRadius='xs' overflow='visible'>
-              <Box flex='1' bg={theme.navColor} style={{ filter: `drop-shadow(0 0 12px ${theme.navColor})` }} />
-              <Box flex='1' bg={theme.bgColor} style={{ filter: `drop-shadow(0 0 12px ${theme.bgColor})` }} />
-              <Box flex='1' bg={theme.font} style={{ filter: `drop-shadow(0 0 12px ${theme.font})` }} />
+            <Box display='flex' h='60px' w='250px' mb='5' borderRadius='xs' overflow='visible'
+              css={{
+                '&:hover .color-swatch-1, &.selected .color-swatch-1': { filter: `drop-shadow(0 0 12px ${theme.navColor})` },
+                '&:hover .color-swatch-2, &.selected .color-swatch-2': { filter: `drop-shadow(0 0 12px ${theme.bgColor})` },
+                '&:hover .color-swatch-3, &.selected .color-swatch-3': { filter: `drop-shadow(0 0 12px ${theme.font})` },
+              }}
+            >
+              <Box flex='1' bg={theme.navColor} className='color-swatch-1' css={{ filter: 'none', transition: 'filter 0.3s ease' }} />
+              <Box flex='1' bg={theme.bgColor} className='color-swatch-2' css={{ filter: 'none', transition: 'filter 0.3s ease' }} />
+              <Box flex='1' bg={theme.font} className='color-swatch-3' css={{ filter: 'none', transition: 'filter 0.3s ease' }} />
             </Box>
 
               <Box display='flex' w='full' justifyContent='space-between' gap='1'>
