@@ -54,7 +54,7 @@ const LayoutCanvas = function({layout, editable=false, onLayoutChange}: { layout
       ` :  "none"}
     >
       {layout.layoutElements.map((element) => {
-      const WidgetComp = widgetMap[element.widgetId].component;
+      const WidgetComp = widgetMap[element.widgetId]?.component;
       if(!WidgetComp){
         return null
       }
