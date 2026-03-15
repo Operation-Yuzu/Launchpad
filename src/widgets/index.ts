@@ -2,6 +2,7 @@ import Calendar from './Calendar';
 import Email from './Email';
 import Link from './Link';
 import Timer from './Timer';
+import AiChat from './AiChat';
 
 import type { WidgetSettings } from '../../types/LayoutTypes';
 
@@ -9,9 +10,10 @@ const WidgetMap: Record<string, { id: number, name: string, component: React.FC<
   1: {id: 1, name: 'Calendar', component: Calendar},
   2: {id: 2, name: 'Email', component: Email},
   3: {id: 3, name: 'Timer', component: Timer},
-  4: {id: 4, name: 'Link', component: Link}
+  4: {id: 4, name: 'Link', component: Link},
+  5: { id: 5, name: 'AI Chat',  component: AiChat },
 };
 
 export default WidgetMap;
 
-export { Calendar, Email, Link, Timer };
+export { Calendar, Email, Link, Timer, AiChat };
