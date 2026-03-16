@@ -164,10 +164,10 @@ function DashEditor() {
         align="flex-start"
       >
         {/* LEFT: GRID EDITOR */}
-        <Box flex="2" display="flex" justifyContent="center">
+        <Box flex="3" height="calc(100vh - 140px)">
           <Box
-            width={`${gridCols * snapSize}px`}
-            height={`${gridRows * snapSize}px`}
+            width="100%"
+            height="100%"
             border="1px solid"
             borderColor="gray.500"
             borderRadius="xl"
