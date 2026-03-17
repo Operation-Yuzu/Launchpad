@@ -53,6 +53,44 @@ layout.get('/:layoutId', async (req, res) => {
   }
 })
 
+//CREATE: This route will create a private layout
+layout.post('/private', async (req, res) => {
+
+  const userId = 1; // replace with auth later
+  const { gridSize, layoutElements } = req.body;
+
+  try {
+
+    const newLayout = await prisma.layout.create({
+      data: {
+        ownerId: userId,
+        public: false,
+        gridSize,
+
+        layoutElements: {
+          create: layoutElements.map(el => ({
+            widgetId: el.widgetId,
+            posX: el.posX,
+            posY: el.posY,
+            sizeX: el.sizeX,
+            sizeY: el.sizeY
+          }))
+        }
+
+      },
+      include: {
+        layoutElements: true
+      }
+    });
+
+    res.status(201).send(newLayout);
+
+  } catch (error) {
+    res.status(500).send({"Could not create layout": error });
+  }
+
+});
+
 //CREATE: This route will copy a public layout
 layout.post('/:layoutId/copy', async (req, res) => {
   //needed to be converted to number
