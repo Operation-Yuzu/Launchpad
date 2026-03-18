@@ -244,19 +244,66 @@ function DragHandle({parentWidth, parentHeight, move, snap}: {parentWidth: numbe
   );
 }
 
-function WidgetFrame({widgetId, posX, posY, sizeX, sizeY, minWidth, minHeight, snapSize, editActive, handleResizeOrMove, children, color, onDelete}: {widgetId: number, posX: number, posY: number, sizeX: number, sizeY: number, minWidth: number, minHeight: number, snapSize: number, editActive: boolean, handleResizeOrMove?: (widgetId: number, posX: number, posY: number, width: number, height: number) => void, children?: React.ReactNode, color: string, onDelete?: (id: number) => void}) {
-  const [top, setTop] = useState(posY * snapSize);
-  const [bottom, setBottom] = useState((posY + sizeY) * snapSize);
-  const [left, setLeft] = useState(posX * snapSize);
-  const [right, setRight] = useState((posX + sizeX) * snapSize);
+function WidgetFrame({widgetId, posX, posY, sizeX, sizeY, minWidth, minHeight, maxWidth, maxHeight, boundingWidth, boundingHeight, snapSize, editActive, handleResizeOrMove, children, color, onDelete}: {widgetId: number, posX: number, posY: number, sizeX: number, sizeY: number, minWidth: number, minHeight: number, maxWidth?: number, maxHeight?: number, boundingWidth: number, boundingHeight: number, snapSize: number, editActive: boolean, handleResizeOrMove?: (widgetId: number, posX: number, posY: number, width: number, height: number) => void, children?: React.ReactNode, color: string, onDelete?: (id: number) => void}) {
+  const [edges, setEdges] = useState({
+    top: posY * snapSize,
+    bottom: (posY + sizeY) * snapSize,
+    left: posX * snapSize,
+    right: (posX + sizeX) * snapSize
+  });
+
+  // originally, top, bottom, left, and right were all separate state variables. This caused problems with constraining the widgets to the field, however, since
+  // the new values of state variables might depend on the current value of other state variables.
+  // The solution, suggested here, https://stackoverflow.com/questions/60444100/how-to-update-multiple-state-at-once-using-react-hook-react-js
+  // is to consolidate all values into one state variable. The destructured values and functions to set a specific edge are provided below
+  // to minimize the amount of existing code that needs to be refactored
+  const { top, bottom, left, right } = edges;
+  const setTop = (f: (old: number) => number) => {
+    setEdges(e => {
+      return {
+        ...e,
+        top: f(e.top)
+      }
+    });
+  };
+  const setBottom = (f: (old: number) => number) => {
+    setEdges(e => {
+      return {
+        ...e,
+        bottom: f(e.bottom)
+      }
+    });
+  };
+  const setLeft = (f: (old: number) => number) => {
+    setEdges(e => {
+      return {
+        ...e,
+        left: f(e.left)
+      }
+    });
+  };
+  const setRight = (f: (old: number) => number) => {
+    setEdges(e => {
+      return {
+        ...e,
+        right: f(e.right)
+      }
+    });
+  };
+
   const { currentTheme } = useContext(UserContext);
 
   const [hasSnapped, setHasSnapped] = useState(false);
 
+  // convert certain props from grid squares to pixels
   const minHeightPx = minHeight * snapSize;
   const minWidthPx = minWidth * snapSize;
+  const maxHeightPx = maxHeight ? maxHeight * snapSize : undefined;
+  const maxWidthPx = maxWidth ? maxWidth * snapSize : undefined;
+  const boundingHeightPx = boundingHeight * snapSize;
+  const boundingWidthPx = boundingWidth * snapSize;
 
-  // constrain to >= minHeight and minWidth
+  // constrain to >= minHeight and minWidth, <= maxHeight and maxWidth, within bounds
   const resize = (side: Side, delta: number) => {
     switch (side) {
       case Side.Top:
@@ -324,11 +371,36 @@ function WidgetFrame({widgetId, posX, posY, sizeX, sizeY, minWidth, minHeight, s
     }
   };
 
+  // constrain to within bounds
   const move = (deltaX: number, deltaY: number) => {
-    setLeft(l => l + deltaX);
-    setRight(r => r + deltaX);
-    setTop(t => t + deltaY);
-    setBottom(b => b + deltaY);
+    // const originalX = deltaX;
+    // const originalY = deltaY;
+
+    setEdges(e => {
+      // don't mix up with the destructured variables outside of this function
+      const {top: t, bottom: b, left: l, right: r} = e;
+
+      // constrain deltaX
+      if (l + deltaX < 0) {
+        deltaX = -l;
+      } else if (r + deltaX > boundingWidthPx) {
+        deltaX = boundingWidthPx - r;
+      }
+
+      // constrain deltaY
+      if (t + deltaY < 0) {
+        deltaY = -t;
+      } else if (b + deltaY > boundingHeightPx) {
+        deltaY = boundingHeightPx - b;
+      }
+
+      return {
+        left: l + deltaX,
+        right: r + deltaX,
+        top: t + deltaY,
+        bottom: b + deltaY
+      }
+    });
   }
 
   const snapPosition = () => {
@@ -396,6 +468,7 @@ function WidgetFrame({widgetId, posX, posY, sizeX, sizeY, minWidth, minHeight, s
     <Container
       padding="5"
       bg="blue"
+      borderRadius="lg"
       position="absolute"
       top={`${top}px`}
       left={`${left}px`}
