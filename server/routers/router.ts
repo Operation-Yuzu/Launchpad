@@ -15,6 +15,7 @@ import dashboard from './dashboard.js';
 import schedule from './schedule.js';
 import accounts from './accounts.js';
 import github from './github.js';
+import publicThemes from './publicThemes.js';
 
 const router = express.Router();
 
@@ -30,6 +31,7 @@ router.use('/timer', timer);
 router.use('/notifications', phoneNumbers);
 router.use('/accounts', accounts);
 router.use('/github', github);
+router.use('/publicThemes', publicThemes);
 
 // router.post('/create', async (req, res) => {
 //   const { name }: { name: string} = req.body;

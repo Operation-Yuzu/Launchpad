@@ -9,20 +9,21 @@ import { UserContext } from './UserContext';
 
 
 function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, ownerId: number}, ownerId: number, dashboardId : number}) {
-  const [themesList, setThemesList] = useState([] as {id: number, navColor: string, bgColor: string, font: string, name: string}[]);
+  const [themesList, setThemesList] = useState([] as {id: number, navColor: string, bgColor: string, font: string, name: string, public: boolean}[]);
 
   // const [form, setForm] = useState({navColor: 'white', bgColor: 'white', font: 'ariel'});
   const [color, setColor] = useState('test')
   const [navColorPick, setNavColorPick] = useState('#ff0000');
   const [bgColorPick, setBgColorPick] = useState('#ff0000');
   const [fontPick, setFontPick] = useState('#ff0000');
-  const [activeDash, setActiveDash] = useState({id: -1, navColor: 'string', bgColor: 'string', font: 'string'});
+  const [activeDash, setActiveDash] = useState({id: -1, navColor: 'string', bgColor: 'string', font: 'string', name: 'string', public: false});
   const [currTheme, setCurrTheme] = useState(activeDash);
+  const [publicStatus, setPublicStatus] = useState(currTheme.public)
   const { setCurrentTheme } = useContext(UserContext);
 
   const allThemes = async () => {
     try {
-      const test = await axios.get(`/theme/${ownerId}`);
+      const test = await axios.get(`/theme/owner/${ownerId}`);
       setThemesList(test.data);
 
     } catch (error) {
@@ -88,21 +89,52 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
   })
 
  // deleting the theme
-  const deleteTheme = async (data: any) => {
+  const deleteTheme = async (data: {themeId: number}) => {
     try {
       const { themeId } = data
       await axios.delete(`/theme/delete/${ownerId}`, {data: { themeId }})
       allThemes()
     } catch (error) {
-      console.error(error)
+      console.error(error);
+    }
+  }
+
+
+  // display all the public themes to the user to save to their own collection
+  const allPublicThemes = async () => {
+    try {
+      const publicThemes = await axios.get('/publicThemes')
+      console.log(publicThemes)
+    } catch (error) {
+      console.error(error);
     }
   }
 
   // make the theme public
   const makePublicTheme = async () => {
     try {
-      await axios.patch(`/theme/${currTheme.id}`)
+      const makePublic = await axios.patch(`/theme/${currTheme.id}`)
+      const updatedTheme = makePublic.data.theme
+
+
+      if(updatedTheme.public === true){
+        await axios.post(`/publicThemes`, {themeId: currTheme.id, ownerId})
+      } else {
+        await axios.delete(`/publicThemes/${currTheme.id}`)
+      }
+      setPublicStatus(updatedTheme.public)
       console.log(currTheme)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  // save a copy of the theme
+  const savePublicTheme = async () => {
+    try {
+
+      await axios.post(`/publicThemes/${currTheme.id}/${ownerId}`)
+
     } catch (error) {
       console.error(error)
     }
@@ -113,6 +145,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
     if(dashboard.ownerId){
       allThemes();
       getTheDash();
+      allPublicThemes();
     }
   }, [dashboard.ownerId])
 
@@ -184,6 +217,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
             deleteTheme({themeId: theme.id})
             }}>{<IoTrashSharp />}</Button>
           <Button size='2xs' variant='ghost' colorPalette='red' onPointerDown={makePublicTheme}>Make them public</Button>
+          <Button size='2xs' variant='ghost' colorPalette='red' onPointerDown={savePublicTheme}>Save this theme</Button>
         </Box>
           ))}
       </Listbox.Content>

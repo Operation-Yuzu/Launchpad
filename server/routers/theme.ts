@@ -5,7 +5,7 @@ import { prisma } from '../database/prisma.js';
 const theme = express.Router();
 
 // find one theme
-theme.get('/theme/:themeId', async (req, res) => {
+theme.get('/:themeId', async (req, res) => {
   try {
     const currentTheme = await prisma.theme.findUnique({
       where: {
@@ -25,7 +25,7 @@ theme.get('/theme/:themeId', async (req, res) => {
 })
 
 // all themes of user
-theme.get('/:ownerId', async (req, res) => {
+theme.get('/owner/:ownerId', async (req, res) => {
   //const { ownerId } = JSON.parse(req.params);
   try {
     const themes = await prisma.theme.findMany({

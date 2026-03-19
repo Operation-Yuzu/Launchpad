@@ -19,7 +19,22 @@ publicThemes.get('/', async (req, res) => {
   }
 })
 
+// add the theme to the public list
 
+publicThemes.post('/', async (req, res) => {
+  const { themeId, ownerId} = req.body
+  try {
+    await prisma.publicThemes.create({
+      data: {
+        themeId: themeId,
+        ownerId: ownerId
+      }
+    })
+    return res.status(201).send('added theme to the list of public themes')
+  } catch (error) {
+    return res.status(500).send({ 'Could not save theme': error })
+  }
+})
 // add a public theme to the users theme collection but with the user who is saving the theme
 // it need to be a COPY
 publicThemes.post('/:themeId/:userId', async (req, res) => {
@@ -37,7 +52,7 @@ publicThemes.post('/:themeId/:userId', async (req, res) => {
     }
 
     // create a COPY of the theme - so it does NOT affect the original
-    const themeCopy = await prisma.theme.create({
+    await prisma.theme.create({
       data: {
         navColor: original.navColor,
         bgColor: original.bgColor,
@@ -49,14 +64,14 @@ publicThemes.post('/:themeId/:userId', async (req, res) => {
     })
 
     
-    const publicTheme = await prisma.publicThemes.create({
-      data: {
-        themeId: themeCopy.id,
-        ownerId: userId
-      }
-    })
+    // const publicTheme = await prisma.publicThemes.create({
+    //   data: {
+    //     themeId: themeCopy.id,
+    //     ownerId: userId
+    //   }
+    // })
 
-    return res.status(201).send({ publicTheme })
+    return res.status(201).send('it was added to the users profile')
   } catch (error) {
     return res.status(500).send({ 'Could not save theme': error })
   }
@@ -68,9 +83,9 @@ publicThemes.delete('/:id', async (req, res) => {
   const id = Number(req.params.id)
 
   try {
-    const existing = await prisma.publicThemes.findUnique({
+    const existing = await prisma.publicThemes.findFirst({
       where: {
-        id
+        themeId: id
       }
     })
 
@@ -80,7 +95,7 @@ publicThemes.delete('/:id', async (req, res) => {
 
     await prisma.publicThemes.delete({
       where: {
-        id
+        id: existing.id
       }
     })
 
