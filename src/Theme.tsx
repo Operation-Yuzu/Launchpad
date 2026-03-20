@@ -63,6 +63,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
         dashboards.forEach((dash: any) => {
           if(dash.id === dashboardId){
             setActiveDash(dash)
+            setCurrTheme(dash)
           }
         })
 
@@ -74,7 +75,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
 //  for patch - update the theme on the current dashboard
   const updateTheme = async (data: any) => {
     try {
-    await axios.patch(`/theme`, {...data, ownerId: ownerId})
+    await axios.patch(`/theme/`, {...data, ownerId: ownerId})
     await allThemes()
     await getTheDash()
     }catch (error) {
@@ -94,7 +95,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
     try {
       const { themeId } = data
       await axios.delete(`/theme/delete/${ownerId}`, {data: { themeId }})
-      allThemes()
+      await allThemes();
     } catch (error) {
       console.error(error);
     }
@@ -238,14 +239,14 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
       {themesList.slice(page * 4, (page + 1) * 4).map((theme) => (
         // bringing back the functionality for each theme card
         <Box key={theme.id} borderRadius="14px" border={currTheme.id === theme.id ? `1px solid ${theme.navColor}88` : '0.5px solid rgba(255,255,255,0.08)'}
-        bg="rgba(255,255,255,0.03)" position="relative" cursor="pointer" transition="all 0.18s" onClick={() => {
+        bg="rgba(255,255,255,0.03)" position="relative" cursor="pointer" transition="all 0.18s" onClick={async () => {
             setCurrTheme(theme)
             setNavColorPick(theme.navColor)
             setBgColorPick(theme.bgColor)
             setFontPick(theme.font)
             setCurrentTheme(theme)
             axios.patch(`/dashboard/${dashboardId}`, { themeId: theme.id })
-            getTheDash()
+            await getTheDash()
           }}
           _hover={{ transform: 'translateY(-1px)', borderColor: 'rgba(255,255,255,0.18)' }}>
           {/* displaying the colors side by side */}
@@ -307,9 +308,10 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
                   bg="rgba(248,113,113,0.08)"
                   border="0.5px solid rgba(248,113,113,0.2)"
                   _hover={{ opacity: 0.75 }}
-                  onPointerDown={(e) => {
+                  onPointerDown={async (e) => {
                     e.preventDefault(); e.stopPropagation()
-                    deleteTheme({ themeId: theme.id })
+                    await deleteTheme({ themeId: theme.id })
+                    
                   }}
                 >
                   <IoTrashSharp />

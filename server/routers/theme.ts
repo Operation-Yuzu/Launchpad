@@ -4,25 +4,6 @@ import { prisma } from '../database/prisma.js';
 
 const theme = express.Router();
 
-// find one theme
-theme.get('/:themeId', async (req, res) => {
-  try {
-    const currentTheme = await prisma.theme.findUnique({
-      where: {
-        id: Number(req.params.themeId)
-      }
-    })
-    console.log(currentTheme)
-    if(!currentTheme){
-      return res.status(404).send('No theme was found')
-    }
-
-    res.status(200).send(currentTheme)
-  } catch (error) {
-    console.error('You have no theme selected', error);
-    res.sendStatus(500);
-  }
-})
 
 // all themes of user
 theme.get('/owner/:ownerId', async (req, res) => {
@@ -43,6 +24,29 @@ theme.get('/owner/:ownerId', async (req, res) => {
     res.sendStatus(500);
   }
 })
+
+
+
+// find one theme
+theme.get('/:themeId', async (req, res) => {
+  try {
+    const currentTheme = await prisma.theme.findUnique({
+      where: {
+        id: Number(req.params.themeId)
+      }
+    })
+    console.log(currentTheme)
+    if(!currentTheme){
+      return res.status(404).send('No theme was found')
+    }
+
+    res.status(200).send(currentTheme)
+  } catch (error) {
+    console.error('You have no theme selected', error);
+    res.sendStatus(500);
+  }
+})
+
 
 // POST - Creating a new theme
 theme.post('/', async (req, res) => {
@@ -67,6 +71,7 @@ theme.post('/', async (req, res) => {
 
 // PUT/PATCH - Updates the theme that is current selected
 theme.patch('/', async (req, res) => {
+  console.log('PATCH / hit, body:', req.body)
   const { id, public: isPublic, navColor, bgColor, font, ownerId} = req.body
   try {
     await prisma.theme.update({
@@ -139,7 +144,7 @@ theme.delete('/delete/:ownerId', async (req, res) => {
   try {
     await prisma.theme.delete({
       where: {
-        ownerId: Number(req.params.ownerId),
+        
         id: themeId
       }
     })
