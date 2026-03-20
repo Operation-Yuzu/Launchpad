@@ -2,7 +2,7 @@ import express from 'express';
 import passport from 'passport'
 
 //import { Prisma } from '@prisma/client';
-import { Prisma } from '../../generated/prisma/client.js'; // not sure about this, although it matches what was in database/prisma
+import { Prisma, Layout } from '../../generated/prisma/client.js';
 import { prisma } from '../database/prisma.js';
 import theme from './theme.js';
 
@@ -145,36 +145,49 @@ dashboard.post('/', async (req, res) => {
   try {
     // auth would go here
       //Load layout id = 1 as default since seed create layout(temp)
+    // TO FIX: what if layout id 1 isn't public???
     const defaultLayout = await prisma.layout.findUnique({
       where: { id: 1 },
       include: {
         layoutElements: true
       }
     });
+    
+    //Create new private layout
+    let newLayout: Layout;
 
     //Check if default layout exist
     if (!defaultLayout) {
-      return res.status(500).send("Default layout missing");
+      // create new layout from scratch if no default
+      newLayout = await prisma.layout.create({
+        data: {
+          ownerId,
+          public: false,
+          gridSize: "medium"
+        }
+      })
+    } else {
+      // use default layout as model if it exists
+      newLayout = await prisma.layout.create({
+        data: {
+          ownerId,
+          public: false,
+          gridSize: defaultLayout.gridSize
+        }
+      });
+      //Copy layout elements
+      await prisma.layoutElement.createMany({
+        data: defaultLayout.layoutElements.map(el => ({
+          layoutId: newLayout.id,
+          widgetId: el.widgetId,
+          posX: el.posX,
+          posY: el.posY,
+          sizeX: el.sizeX,
+          sizeY: el.sizeY
+        }))
+      });
+
     }
-    //Create new private layout
-    const newLayout = await prisma.layout.create({
-      data: {
-        ownerId,
-        public: false,
-        gridSize: defaultLayout.gridSize
-      }
-    });
-    //Copy layout elements
-    await prisma.layoutElement.createMany({
-      data: defaultLayout.layoutElements.map(el => ({
-        layoutId: newLayout.id,
-        widgetId: el.widgetId,
-        posX: el.posX,
-        posY: el.posY,
-        sizeX: el.sizeX,
-        sizeY: el.sizeY
-      }))
-    });
 
     if (!ownerId) {
       return res.status(401).json({ error: "Unauthorized" });
