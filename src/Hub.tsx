@@ -517,7 +517,7 @@ export default function Hub(
               </Text>
               <Accounts />
             </Box>
-          <ColorblindFilterBox />
+          {/* <ColorblindFilterBox /> */}
           </HStack>
           {/* Dashboards */}
           <Box
