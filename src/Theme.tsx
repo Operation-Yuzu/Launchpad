@@ -1,10 +1,9 @@
-
 import { useState, useEffect, useContext} from 'react';
 import { parseColor } from "@chakra-ui/react"
 import Color from './ColorPicker';
 import axios from 'axios';
 import { Box, Button, Text, Listbox, createListCollection } from "@chakra-ui/react"
-import { IoTrashSharp, IoPencilSharp, IoAddCircleOutline } from "react-icons/io5";
+import { IoTrashSharp, IoPencilSharp, IoAddCircleOutline, IoPeopleSharp, IoPeopleOutline } from "react-icons/io5";
 import { UserContext } from './UserContext';
 
 
@@ -19,6 +18,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
   const [activeDash, setActiveDash] = useState({id: -1, navColor: 'string', bgColor: 'string', font: 'string', name: 'string', public: false});
   const [currTheme, setCurrTheme] = useState(activeDash);
   const [publicStatus, setPublicStatus] = useState(currTheme.public);
+  const [editingTheme, setEditingTheme] = useState(false)
   const [page, setPage] = useState(0);
   const { setCurrentTheme } = useContext(UserContext);
 
@@ -63,7 +63,6 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
         dashboards.forEach((dash: any) => {
           if(dash.id === dashboardId){
             setActiveDash(dash)
-            setCurrTheme(dash)
           }
         })
 
@@ -113,7 +112,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
   }
 
   // make the theme public
-  const makePublicTheme = async () => {
+  const makePublicTheme = async (currTheme: {id: number, public: boolean}) => {
     try {
       const makePublic = await axios.patch(`/theme/${currTheme.id}`)
       const updatedTheme = makePublic.data.theme
@@ -125,6 +124,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
         await axios.delete(`/publicThemes/${currTheme.id}`)
       }
       setPublicStatus(updatedTheme.public)
+      await allThemes()
       console.log(currTheme)
     } catch (error) {
       console.error(error)
@@ -142,6 +142,19 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
     }
   }
 
+  // added a userEffect so that when the user opens the editor the current theme is shown active
+  useEffect(() => {
+    // if the themesList has content and the dash isnt a demo find and set the current theme
+    if(themesList.length > 0 && activeDash.id !== -1){
+      const existing = themesList.find(theme => theme.id === (activeDash as any).themeId)
+      // if it does exist then it needs to me the current theme
+      if(existing) {
+        setCurrTheme(existing)
+      }
+    }
+  }, [activeDash.id, themesList.length])
+
+
   useEffect(() => {
     // if the owner is provided
     if(dashboard.ownerId){
@@ -151,7 +164,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
     }
   }, [dashboard.ownerId])
 
-  const colors = ['navColor', 'bgColor', 'font'] as const;
+  const colors = ['Nav', 'Bg', 'Widget'] as const;
   // renaming the color holders
   const colorMap = {
     navColor: 'Nav',
@@ -246,7 +259,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
             setFontPick(theme.font)
             setCurrentTheme(theme)
             axios.patch(`/dashboard/${dashboardId}`, { themeId: theme.id })
-            await getTheDash()
+            //await getTheDash()
           }}
           _hover={{ transform: 'translateY(-1px)', borderColor: 'rgba(255,255,255,0.18)' }}>
           {/* displaying the colors side by side */}
@@ -275,7 +288,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
             {currTheme.id === theme.id && (
                   <Box bg="rgba(56,189,248,0.15)" color="#38bdf8"
                     fontSize="8px" fontWeight="500" px="1.5" py="0.5"
-                    borderRadius="20px" fontFamily="mono">
+                    borderRadius="20px" >
                     active
                   </Box>
                 )}
@@ -284,7 +297,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
                   color={theme.public ? '#4ade80' : 'whiteAlpha.400'}
                   border={theme.public ? 'none' : '0.5px solid rgba(255,255,255,0.1)'}
                   fontSize="8px" fontWeight="500" px="1.5" py="0.5"
-                  borderRadius="20px" fontFamily="mono">
+                  borderRadius="20px" >
                   {theme.public ? 'public' : 'private'}
                 </Box>
             </Box>
@@ -294,13 +307,19 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
                   borderRadius="6px" color="whiteAlpha.400"
                   border="0.5px solid rgba(255,255,255,0.08)"
                   _hover={{ color: 'whiteAlpha.800', bg: 'whiteAlpha.100' }}
-                  onPointerDown={(e) => {
+                  onPointerDown={async (e) => {
                     e.preventDefault(); e.stopPropagation()
-                    makePublicTheme()
+                    await makePublicTheme(theme);
+                    setCurrTheme(theme)
+                    setNavColorPick(theme.navColor)
+                    setBgColorPick(theme.bgColor)
+                    setFontPick(theme.font)
+                    setEditingTheme(true)
+                    
                   }}
                   title={theme.public ? 'Make private' : 'Make public'}
                 >
-                  {theme.public ? '○' : '◉'}
+                  {theme.public ? <IoPeopleSharp /> : <IoPeopleOutline /> }
                 </Button>
                 <Button
                   size="2xs" variant="ghost" minW="22px" h="22px" p="0"
@@ -339,7 +358,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
           <Button
             key={i} size="xs" variant="ghost"
             minW="24px" h="24px" p="0" borderRadius="6px"
-            fontSize="10px" fontFamily="mono"
+            fontSize="10px"
             color={i === page ? 'whiteAlpha.900' : 'whiteAlpha.400'}
             bg={i === page ? 'whiteAlpha.100' : 'transparent'}
             border={i === page ? '0.5px solid rgba(255,255,255,0.2)' : '0.5px solid transparent'}
