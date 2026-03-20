@@ -305,7 +305,13 @@ dashboard.patch('/:id', async (req, res) => {
 dashboard.post('/:dashboardId/layout/:layoutId', async (req, res) => {
   const dashboardId = Number(req.params.dashboardId)
   const layoutId = Number(req.params.layoutId);
-  const userId = 1; //TODO: add auth
+
+  const userId = req.user?.id;
+  if (userId === undefined) {
+    res.sendStatus(401);
+    return;
+  }
+  
   try {
     //Fetch public layout
     const sourceLayout = await prisma.layout.findUnique({

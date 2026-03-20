@@ -57,7 +57,13 @@ layout.get('/:layoutId', async (req, res) => {
 layout.post('/:layoutId/copy', async (req, res) => {
   //needed to be converted to number
   const layoutId = Number(req.params.layoutId);
-  const userId = 1; //TODO: add auth
+
+  const userId = req.user?.id;
+  if (userId === undefined) {
+    res.sendStatus(401);
+    return;
+  }
+
   try {
     //query db to find one layout w/ layoutId
     const sourceLayout = await prisma.layout.findUnique({
