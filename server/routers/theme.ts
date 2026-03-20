@@ -25,7 +25,24 @@ theme.get('/owner/:ownerId', async (req, res) => {
   }
 })
 
-
+// for getting public themes
+theme.get('/public', async (req, res) => {
+  try {
+    const themes = await prisma.theme.findMany({
+      where: {
+        public: true
+      }
+    })
+    if (themes) {
+      res.status(200).send(themes)
+    } else {
+      res.sendStatus(404)
+    }
+  } catch (error) {
+    console.error('Could not get public themes', error)
+    res.sendStatus(500)
+  }
+})
 
 // find one theme
 theme.get('/:themeId', async (req, res) => {
