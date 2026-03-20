@@ -39,7 +39,10 @@ link.get('/:layoutElementId', async (req, res) => {
     if (linkSettings === null) {
       return res.sendStatus(404);
     } else {
-      res.status(200).send(linkSettings.url);
+      res.status(200).send({
+        url: linkSettings.url,
+        displayText: linkSettings.displayText
+      });
     }
   } catch (error) {
     console.error('Failed to GET link url:', error);
@@ -57,7 +60,7 @@ link.patch('/:layoutElementId', async (req, res) => {
   }
 
   const layoutElementId = parseInt(req.params.layoutElementId);
-  const { url }: { url: string | undefined }  = req.body;
+  const { url, displayText }: { url: string | undefined, displayText: string | undefined }  = req.body;
 
   if (isNaN(layoutElementId) || url === undefined) {
     // bad request
@@ -100,11 +103,13 @@ link.patch('/:layoutElementId', async (req, res) => {
         widgetSettingsId: widgetSettings.id
       },
       update: {
-        url
+        url,
+        displayText
       },
       create: {
         widgetSettingsId: widgetSettings.id,
-        url
+        url,
+        displayText
       }
     });
 
