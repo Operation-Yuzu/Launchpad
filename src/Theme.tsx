@@ -18,7 +18,8 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
   const [activeDash, setActiveDash] = useState({id: -1, navColor: 'string', bgColor: 'string', font: 'string', name: 'string', public: false});
   const [currTheme, setCurrTheme] = useState(activeDash);
   const [publicStatus, setPublicStatus] = useState(currTheme.public);
-  const [editingTheme, setEditingTheme] = useState(false)
+  const [editingTheme, setEditingTheme] = useState(false);
+  const [publicList, setPublicList] = useState([] as {id: number, navColor: string, bgColor: string, font: string, name: string, public: boolean}[])
   const [page, setPage] = useState(0);
   const { setCurrentTheme } = useContext(UserContext);
 
@@ -104,7 +105,8 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
   // display all the public themes to the user to save to their own collection
   const allPublicThemes = async () => {
     try {
-      const publicThemes = await axios.get('/publicThemes')
+      const publicThemes = await axios.get('/theme/public')
+      setPublicList(publicThemes.data)
       console.log(publicThemes)
     } catch (error) {
       console.error(error);
@@ -125,6 +127,8 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
       }
       setPublicStatus(updatedTheme.public)
       await allThemes()
+      await allPublicThemes()
+      setPage(0); // testing to see if it pushes public to the front
       console.log(currTheme)
     } catch (error) {
       console.error(error)
@@ -132,11 +136,17 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
   }
 
   // save a copy of the theme
-  const savePublicTheme = async () => {
+  const savePublicTheme = async (theme: any) => {
     try {
-
-      await axios.post(`/publicThemes/${currTheme.id}/${ownerId}`)
-
+      await axios.post('/theme', {
+        navColor: theme.navColor,
+        bgColor: theme.bgColor,
+        font: theme.font,
+        name: theme.name,
+        public: false,   // back to default
+        ownerId: ownerId
+      })
+      await allThemes()
     } catch (error) {
       console.error(error)
     }
@@ -174,6 +184,105 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
 
   return (
     <Box>
+      {/* temp space for public themes */}
+      <Box display='flex' alignItems='center' justifyContent='space-between' mb='3'>
+      <Text fontSize='12px' fontWeight='500' color='#ffffff' letterSpacing='0.12em' textTransform='uppercase' > Public Themes </Text>
+      {/* making the themes show only 4 at a time - conditional rendering*/}
+      {Math.ceil(publicList.length / 4) > 1 && (
+        <Text fontSize='12px' color='#ffffff'>{page + 1} / {Math.ceil(themesList.length / 4)}</Text>
+      )}
+    </Box>
+
+    <Box display='grid' gridTemplateColumns='1fr 1fr' gap='2' mb='3'>
+      {publicList.slice(page * 4, (page + 1) * 4).map((theme) => (
+        // bringing back the functionality for each theme card
+        <Box key={theme.id} borderRadius='14px' border={ `1px solid ${theme.navColor}88`}
+        bg='rgba(255,255,255,0.03)' position='relative' cursor='pointer' transition='all 0.18s' 
+        // onClick={async () => {
+        //     setCurrTheme(theme)
+        //     setNavColorPick(theme.navColor)
+        //     setBgColorPick(theme.bgColor)
+        //     setFontPick(theme.font)
+        //     setCurrentTheme(theme)
+        //     axios.patch(`/dashboard/${dashboardId}`, { themeId: theme.id })
+        //     //await getTheDash()
+        //   }}
+          _hover={{ transform: 'translateY(-1px)', borderColor: 'rgba(255,255,255,0.18)' }}>
+          {/* displaying the colors side by side */}
+          <Box display='flex' h='52px' borderRadius='13px 13px 0 0' overflow='hidden'>
+            <Box flex='1' bg={theme.navColor} />
+            <Box flex='1' bg={theme.bgColor} />
+            <Box flex='1' bg={theme.font} />
+          </Box>
+
+          {/* title of the color - nav, bg, widget */}
+          <Box display='flex' borderBottom='0.5px solid rgba(255,255,255,0.06)'>
+            {colors.map((title, i) => (
+              <Box key={title} flex='1' textAlign='center' py='1' fontSize='9px' color='#ffffff' letterSpacing='0.06em' borderRight={i < 2 ? '0.5px solid rgba(255,255,255,0.06)' : 'none'}>
+              {title}
+              </Box>
+            ))}
+          </Box>
+
+        {/* for the public / active / and public maker button */}
+        <Box px='2.5' pt='2' pb='1.5'>
+          <Text fontSize='12px' fontWeight='500' color='#ffffff' mb='1.5' maxLines={1}>
+              {theme.name}
+            </Text>
+          <Box display='flex' alignItems='center' justifyContent='space-between'>
+            <Box display='flex' gap='1.5'>
+            {/* {currTheme.id === theme.id && (
+                  <Box bg='rgba(56,189,248,0.15)' color='#38bdf8'
+                    fontSize='12px' fontWeight='500' px='1.5' py='0.5'
+                    borderRadius='20px' >
+                    active
+                  </Box>
+                )}
+                 <Box
+                  bg={theme.public ? 'rgba(34,197,94,0.12)' : 'rgba(255,255,255,0.05)'}
+                  color={theme.public ? '#4ade80' : '#ffffff'}
+                  border={theme.public ? 'none' : '0.5px solid rgba(255,255,255,0.1)'}
+                  fontSize='12px' fontWeight='500' px='1.5' py='0.5'
+                  borderRadius='20px' >
+                  {theme.public ? 'public' : 'private'}
+                </Box> */}
+            </Box>
+            <Box display='flex' gap='1' onClick={(e) => e.stopPropagation()}>
+                <Button
+                  size='sm' variant='ghost' minW='22px' h='22px' p='0'
+                  borderRadius='6px' color='#ffffff'
+                  border='0.5px solid rgba(255,255,255,0.08)'
+                  _hover={{ color: 'whiteAlpha.800', bg: 'whiteAlpha.100' }}
+                  onPointerDown={async (e) => {
+                    e.preventDefault(); e.stopPropagation()
+                    await savePublicTheme(theme);
+                  }}
+                  // title={theme.public ? 'Make private' : 'Make public'}
+                >
+                  +
+                </Button>
+                {/* <Button
+                  size='sm' variant='ghost' minW='22px' h='22px' p='0'
+                  borderRadius='6px' color='#f87171'
+                  bg='rgba(248,113,113,0.08)'
+                  border='0.5px solid rgba(248,113,113,0.2)'
+                  _hover={{ opacity: 0.75 }}
+                  onPointerDown={async (e) => {
+                    e.preventDefault(); e.stopPropagation()
+                    await deleteTheme({ themeId: theme.id })
+                    
+                  }}
+                >
+                  <IoTrashSharp />
+                </Button> */}
+              </Box>
+          </Box>
+        </Box>
+        </Box>
+      ))}
+    </Box>
+
+
     {/* {
       <Listbox.Root collection={allThemesList} width="320px">
       <Listbox.Label fontSize='md' fontWeight='bold'>Select Theme</Listbox.Label>
@@ -217,7 +326,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
                   <Box w='32px' h='32px' borderRadius='8px' bg={theme[key]} border='1px solid rgba(255,255,255,0.12)' boxShadow={`0 0 12px 2px ${theme[key]}cc`} transition='box-shadow 0.3s ease'>
                   </Box>
                   <Text fontSize='15px' color='#64748b' fontWeight='medium' mb='1'>{colorMap[key]}</Text>
-                  {/* <Text fontSize='10px' color='white'>{theme[key]}</Text> */}
+                  {/* <Text fontSize='12px' color='white'>{theme[key]}</Text> */}
                   {/* </Box>
                 ))}
               </Box>
@@ -226,7 +335,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
             <Listbox.ItemIndicator />
             </Listbox.Item>
             
-          <Button size='2xs' variant='ghost' colorPalette='red' onPointerDown={(e) => {
+          <Button size='sm' variant='ghost' colorPalette='red' onPointerDown={(e) => {
             e.preventDefault()
             e.stopPropagation()
             deleteTheme({themeId: theme.id})
@@ -241,10 +350,10 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
 
     {/* Changing the display of the cards and only allow 4 at a time */}
     <Box display='flex' alignItems='center' justifyContent='space-between' mb='3'>
-      <Text fontSize='10px' fontWeight='500' color='whiteAlpha.400' letterSpacing='0.12em' textTransform='uppercase' > Themes </Text>
+      <Text fontSize='12px' fontWeight='500' color='#ffffff' letterSpacing='0.12em' textTransform='uppercase' > Themes </Text>
       {/* making the themes show only 4 at a time - conditional rendering*/}
       {Math.ceil(themesList.length / 4) > 1 && (
-        <Text fontSize='10px' color='whiteAlpha.300'>{page + 1} / {Math.ceil(themesList.length / 4)}</Text>
+        <Text fontSize='12px' color='#ffffff'>{page + 1} / {Math.ceil(themesList.length / 4)}</Text>
       )}
     </Box>
 
@@ -273,7 +382,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
           {/* title of the color - nav, bg, widget */}
           <Box display='flex' borderBottom='0.5px solid rgba(255,255,255,0.06)'>
             {colors.map((title, i) => (
-              <Box key={title} flex='1' textAlign='center' py='1' fontSize='9px' color='whiteAlpha.400' letterSpacing='0.06em' borderRight={i < 2 ? '0.5px solid rgba(255,255,255,0.06)' : 'none'}>
+              <Box key={title} flex='1' textAlign='center' py='1' fontSize='9px' color='#ffffff' letterSpacing='0.06em' borderRight={i < 2 ? '0.5px solid rgba(255,255,255,0.06)' : 'none'}>
               {title}
               </Box>
             ))}
@@ -281,31 +390,31 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
 
         {/* for the public / active / and public maker button */}
         <Box px='2.5' pt='2' pb='1.5'>
-          <Text fontSize='12px' fontWeight='500' color='whiteAlpha.900' mb='1.5' maxLines={1}>
+          <Text fontSize='12px' fontWeight='500' color='#ffffff' mb='1.5' maxLines={1}>
               {theme.name}
             </Text>
           <Box display='flex' alignItems='center' justifyContent='space-between'>
             <Box display='flex' gap='1.5'>
             {currTheme.id === theme.id && (
                   <Box bg='rgba(56,189,248,0.15)' color='#38bdf8'
-                    fontSize='8px' fontWeight='500' px='1.5' py='0.5'
+                    fontSize='12px' fontWeight='500' px='1.5' py='0.5'
                     borderRadius='20px' >
                     active
                   </Box>
                 )}
                  <Box
                   bg={theme.public ? 'rgba(34,197,94,0.12)' : 'rgba(255,255,255,0.05)'}
-                  color={theme.public ? '#4ade80' : 'whiteAlpha.400'}
+                  color={theme.public ? '#4ade80' : '#ffffff'}
                   border={theme.public ? 'none' : '0.5px solid rgba(255,255,255,0.1)'}
-                  fontSize='8px' fontWeight='500' px='1.5' py='0.5'
+                  fontSize='12px' fontWeight='500' px='1.5' py='0.5'
                   borderRadius='20px' >
                   {theme.public ? 'public' : 'private'}
                 </Box>
             </Box>
             <Box display='flex' gap='1' onClick={(e) => e.stopPropagation()}>
                 <Button
-                  size='2xs' variant='ghost' minW='22px' h='22px' p='0'
-                  borderRadius='6px' color='whiteAlpha.400'
+                  size='sm' variant='ghost' minW='22px' h='22px' p='0'
+                  borderRadius='6px' color='#ffffff'
                   border='0.5px solid rgba(255,255,255,0.08)'
                   _hover={{ color: 'whiteAlpha.800', bg: 'whiteAlpha.100' }}
                   onPointerDown={async (e) => {
@@ -323,7 +432,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
                   {theme.public ? <IoPeopleSharp /> : <IoPeopleOutline /> }
                 </Button>
                 <Button
-                  size='2xs' variant='ghost' minW='22px' h='22px' p='0'
+                  size='sm' variant='ghost' minW='22px' h='22px' p='0'
                   borderRadius='6px' color='#f87171'
                   bg='rgba(248,113,113,0.08)'
                   border='0.5px solid rgba(248,113,113,0.2)'
@@ -349,7 +458,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
       <Box display='flex' alignItems='center' justifyContent='center' gap='1.5' mb='3'>
         <Button
           size='xs' variant='ghost' minW='28px' h='28px' p='0' borderRadius='7px'
-          color='whiteAlpha.500' border='0.5px solid rgba(255,255,255,0.08)'
+          color='#ffffff' border='0.5px solid rgba(255,255,255,0.08)'
           disabled={page === 0}
           onClick={() => setPage((p) => Math.max(0, p - 1))}
           _hover={{ color: 'white', bg: 'whiteAlpha.100' }}
@@ -359,7 +468,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
           <Button
             key={i} size='xs' variant='ghost'
             minW='24px' h='24px' p='0' borderRadius='6px'
-            fontSize='10px'
+            fontSize='12px'
             color={i === page ? 'whiteAlpha.900' : 'whiteAlpha.400'}
             bg={i === page ? 'whiteAlpha.100' : 'transparent'}
             border={i === page ? '0.5px solid rgba(255,255,255,0.2)' : '0.5px solid transparent'}
@@ -370,9 +479,9 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
 
         <Button
           size='xs' variant='ghost' minW='28px' h='28px' p='0' borderRadius='7px'
-          color='whiteAlpha.500' border='0.5px solid rgba(255,255,255,0.08)'
+          color='#ffffff' border='0.5px solid rgba(255,255,255,0.08)'
           disabled={page === Math.ceil(themesList.length / 4) - 1}
-          onClick={() => setPage((p) => p + 1)}
+          onClick={() => setPage((page) => page + 1)}
           _hover={{ color: 'white', bg: 'whiteAlpha.100' }}
         >›</Button>
       </Box>
@@ -380,7 +489,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
 
 
 
-    <Text fontSize='10px' fontWeight='500' color='whiteAlpha.400' letterSpacing='0.12em' textTransform='uppercase' > Create a Theme </Text>
+    <Text fontSize='12px' fontWeight='500' color='#ffffff' letterSpacing='0.12em' textTransform='uppercase' > Create a Theme </Text>
     <Box borderRadius='14px' border='0.5px solid rgba(255,255,255,0.08)' bg='rgba(255,255,255,0.03)' overflow='hidden' mt='3'>
 
   {/* color stack */}
@@ -394,7 +503,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
   <Box display='flex' borderBottom='0.5px solid rgba(255,255,255,0.06)'>
     {['Nav', 'Bg', 'Widget'].map((t, i) => (
       <Box key={t} flex='1' textAlign='center' py='1' fontSize='9px'
-        color='whiteAlpha.400' letterSpacing='0.06em'
+        color='#ffffff' letterSpacing='0.06em'
         borderRight={i < 2 ? '0.5px solid rgba(255,255,255,0.06)' : 'none'}>
         {t}
       </Box>
@@ -409,7 +518,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
     ].map(({ label, value, setter }) => (
       <Box key={label} display='flex' alignItems='center' gap='2'
         py='1.5' borderBottom='0.5px solid rgba(255,255,255,0.06)'>
-        <Text fontSize='11px' color='whiteAlpha.500' w='72px' flexShrink={0}>{label}</Text>
+        <Text fontSize='11px' color='#ffffff' w='72px' flexShrink={0}>{label}</Text>
 
         <Color value={value} onValueChange={colorPicker(setter)} />
       </Box>
@@ -417,7 +526,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
 
     <Box display='flex' gap='2' mt='2.5'>
       <Button flex='1' size='sm' variant='ghost'
-        color='whiteAlpha.400'
+        color='#ffffff'
         border='0.5px solid rgba(255,255,255,0.1)'
         borderRadius='9px' fontSize='11px'
         _hover={{ bg: 'whiteAlpha.100' }}
