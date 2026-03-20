@@ -200,16 +200,26 @@ function DashEditor() {
               />
             </Box>
 
-            {selectedLayout && (
-              <Box mt={4}>
-                {/* <h4>LAYOUT PREVIEW</h4>
-                <p>SELECTED LAYOUT #{selectedLayoutId}</p>
-                <p>GRID SIZE: {selectedLayout.gridSize}</p> */}
+            <Flex justify="flex-end" mt={8} px={6} gap={2}>
+              {selectedLayout && (
                 <button onClick={() => applyLayout(selectedLayout.id)}>
-                  APPLY SELECTED LAYOUT
+                  Apply Layout
                 </button>
-              </Box>
-            )}
+              )}
+              <Link to="/Dashboard">
+                <Box
+                  px={4}
+                  py={2}
+                  borderRadius="md"
+                  bg="orange.50"
+                  color="gray"
+                  fontWeight="bold"
+                  _hover={{ bg: "orange.300" }}
+                >
+                  Done
+                </Box>
+              </Link>
+            </Flex>
             {dashboard.layout && (
               <WidgetLibrary
                 layoutId={dashboard.layout.id}
@@ -230,7 +240,7 @@ function DashEditor() {
             color="gray"
             fontWeight="bold"
             _hover={{ bg: "orange.300" }}
-            >
+          >
             Done
           </Box>
         </Link>
