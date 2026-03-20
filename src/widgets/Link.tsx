@@ -142,7 +142,7 @@ function LinkWidget ({widgetId, settings}: {widgetId: number, settings: WidgetSe
         <Link href={linkUrl.slice(0,4) === 'http' ? linkUrl : `https://${linkUrl}`}>
           {/* assuming that https is more common than http */}
           <Heading>
-            {displayText ?? linkUrl}
+            {displayText || linkUrl}
           </Heading>
           <Icon size="sm" marginRight="0.5rem" >
             <LuExternalLink/>
