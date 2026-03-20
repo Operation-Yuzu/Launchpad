@@ -28,7 +28,7 @@ function LayoutGallery({onSelect, selectedLayoutId, currentLayoutId}: Props) {
 
         // Filter out private layouts that match the applied dashboard layout
       const filteredPrivate = privateRes.data
-        .filter((layout: Layout) => layout.id !== currentLayoutId).slice(-4);
+        .filter((layout: Layout) => layout.id !== currentLayoutId || privateRes.data.length === 1);
           setPublicLayouts(publicRes.data);
          setPrivateLayouts(filteredPrivate);
     } catch (err) {
