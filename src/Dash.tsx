@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext, type ChangeEvent } from 'react';
 import axios from 'axios';
-import { AbsoluteCenter, Box, Button, Container, Flex, Heading, Icon, IconButton, ScrollArea, Spinner } from "@chakra-ui/react";
+import { AbsoluteCenter, Box, Button, Center, Container, Flex, Grid, GridItem, Heading, Icon, IconButton, ScrollArea, Spinner, VStack } from "@chakra-ui/react";
 import { LuCheck, LuPencil } from "react-icons/lu";
 
 import NavBar from "./NavBar";
@@ -44,6 +44,7 @@ export default function Dashboard () {
       // originally, the /dashboard/:id route didn't include the theme data, so omit the theme from the dashboard state var
       const { theme, ...dashboard } = response.data;
       setDashboard(dashboard);
+      setNewName(dashboard.name);
       setTheme(theme);
       setThemeId(dashboard.themeId);
       setLoading(false);
@@ -140,6 +141,55 @@ export default function Dashboard () {
     }
   }
 
+  const renderContent = () => {
+    if (!dashboard) return null;
+
+    if (!editMode) {
+      return (
+        <Grid>
+          <GridItem>
+            <LayoutCanvas
+              layout={dashboard.layout}
+              editable={editMode}
+            />
+          </GridItem>
+        </Grid>
+      );
+    }
+
+    return (
+      <Grid
+        templateRows={{xlDown: "repeat(2, 1fr)", '2xl': "repeat(1, 1fr)"}}
+        templateColumns={{lgDown: "repeat(2, 1fr)", xl: "repeat(3, 1fr)", '2xl': "repeat(4, 1fr)"}}
+      >
+        <GridItem
+          colSpan={2}
+          rowSpan={{lgDown: 1, xl: 2, '2xl': 1}}
+          order={{xlDown: 1, '2xl': 2}}
+        >
+          <LayoutCanvas
+            layout={dashboard.layout}
+            editable={editMode}
+          />
+        </GridItem>
+        <GridItem
+          colSpan={1}
+          rowSpan={1}
+          order={{xlDown: 2, '2xl': 1}}
+        >
+          <Container bgColor="blue" w="100%" h="100%"/>
+        </GridItem>
+        <GridItem
+          colSpan={1}
+          rowSpan={1}
+          order={3}
+        >
+          <Container bgColor="green" w="100%" h="100%"/>
+        </GridItem>
+      </Grid>
+    );
+  };
+
   // early return for loading state, guards against null dashboard
   if (!dashboard || loading) {
     return (
@@ -161,13 +211,12 @@ export default function Dashboard () {
         <ScrollArea.Root width="100%">
           <ScrollArea.Viewport>
             <ScrollArea.Content position="relative">
-              <Container >
-                {renderName()}
-                <LayoutCanvas
-                  layout={dashboard.layout}
-                  editable={editMode}>
-                </LayoutCanvas>
-              </Container>
+              <Center>
+                <VStack>
+                  {renderName()}
+                  {renderContent()}
+                </VStack>
+              </Center>
             </ScrollArea.Content>
           </ScrollArea.Viewport>
           <ScrollArea.Scrollbar orientation="horizontal" />
