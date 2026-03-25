@@ -1,6 +1,6 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, type ChangeEvent } from 'react';
 import axios from 'axios';
-import { AbsoluteCenter, Box, Container, IconButton, ScrollArea, Spinner } from "@chakra-ui/react";
+import { AbsoluteCenter, Box, Button, Container, Flex, Heading, Icon, IconButton, ScrollArea, Spinner } from "@chakra-ui/react";
 import { LuCheck, LuPencil } from "react-icons/lu";
 
 import NavBar from "./NavBar";
@@ -18,7 +18,19 @@ export default function Dashboard () {
   const [editMode, setEditMode] = useState(false);
   const [themeId, setThemeId] = useState(-1);
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
-  const [theme, setTheme] = useState({} as ThemeObject)
+  const [theme, setTheme] = useState({} as ThemeObject);
+  const [newName, setNewName] = useState('');
+  const [renaming, setRenaming] = useState(false);
+
+  const handleChangeNewName = (event: ChangeEvent) => {
+    const target = event.target as unknown as HTMLInputElement; // whyyyyy
+    setNewName(target.value);
+  };
+
+  const handleCancelRename = () => {
+    setRenaming(false);
+    setNewName(dashboard?.name || '');
+  }
 
   const loadDashboard = async () => {
     // not a real dash
@@ -59,6 +71,21 @@ export default function Dashboard () {
     }
   };
 
+  const renameDashboard = async () => {
+    if (newName === dashboard?.name) {
+      setRenaming(false);
+      return; // don't bother sending a request if it won't change anything
+    }
+
+    try {
+      await axios.patch(`/dashboard/${activeDash}`, {name: newName})
+      loadDashboard();
+      setRenaming(false);
+    } catch (error) {
+      console.error('Failed to rename dashboard:', error);
+    }
+  };
+
   useEffect(() => {
     loadDashboard();
   }, [activeDash]);
@@ -71,6 +98,47 @@ export default function Dashboard () {
     );
   };
 
+  const renderName = () => {
+    if (!dashboard) return null;
+
+    const nameHeight = "40px"; // avoid "bouncing" due to different sizes
+
+    if (!editMode) {
+      return (
+        <Flex align="center" height={nameHeight}>
+          <Heading>{dashboard.name}</Heading>
+        </Flex>
+      );
+    }
+
+    if (renaming) {
+      return (
+        <Flex align="center" height={nameHeight}>
+          <input
+          onChange={handleChangeNewName}
+          value={newName}
+          style={{
+            color: "black",
+            backgroundColor: "white",
+            border: "1px solid #82de11",
+            padding: "4px"
+          }}
+          />
+          <Button onClick={renameDashboard}>Save</Button>
+          <Button onClick={handleCancelRename}>Cancel</Button>
+        </Flex>
+      );
+    } else {
+      return (
+        <Flex align="center" onClick={() => setRenaming(true)} height={nameHeight}>
+          <Heading >{dashboard.name}</Heading>
+          <Icon>
+            <LuPencil />
+          </Icon>
+        </Flex>
+      );
+    }
+  }
 
   // early return for loading state, guards against null dashboard
   if (!dashboard || loading) {
@@ -94,6 +162,7 @@ export default function Dashboard () {
           <ScrollArea.Viewport>
             <ScrollArea.Content position="relative">
               <Container >
+                {renderName()}
                 <LayoutCanvas
                   layout={dashboard.layout}
                   editable={editMode}>
