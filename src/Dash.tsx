@@ -14,8 +14,33 @@ import changeTextColor from './utilities/color.ts'
 import type { ThemeObject } from '../types/Calendar';
 import type { Layout, Dashboard } from '../types/LayoutTypes';
 
+enum SettingsPosition {
+  BothSides = 'BOTH_SIDES',
+  RightSide = 'RIGHT_SIDE',
+  Below = 'BELOW'
+}
+
 export default function Dashboard () {
   const { activeDash, user: { id: ownerId } } = useContext(UserContext);
+
+  // TODO: these should probably be stored in the dashboard object or something
+  const columns = 19;
+  const rows = 12;
+  const snapSize = 60;
+
+  const canvasWidth = columns * snapSize;
+  const settingsWidth = 520;
+  const spacing = 0;
+
+  const oneSidebarBreakpoint = canvasWidth + spacing + settingsWidth;
+  const twoSidebarBreakpoint = canvasWidth + 2 * (spacing + settingsWidth);
+
+  // the media queries need to be declared before the first invocation of checkBreakpoints()
+  const belowQuery = window.matchMedia(`(width < ${oneSidebarBreakpoint}px)`);
+  const twoSidebarQuery = window.matchMedia(`(width >= ${twoSidebarBreakpoint}px)`);
+
+  belowQuery.addEventListener('change', () => setSettingsOrientation(checkBreakpoints()));
+  twoSidebarQuery.addEventListener('change', () => setSettingsOrientation(checkBreakpoints()));
 
   const [editMode, setEditMode] = useState(false);
   const [themeId, setThemeId] = useState(-1);
@@ -24,7 +49,8 @@ export default function Dashboard () {
   const [newName, setNewName] = useState('');
   const [renaming, setRenaming] = useState(false);
   const [selectedLayoutId, setSelectedLayoutId] = useState(-1);//(-1 = nothing selected)
-  const [selectedLayout, setSelectedLayout] = useState<Layout | null>(null)
+  const [selectedLayout, setSelectedLayout] = useState<Layout | null>(null);
+  const [settingsOrientation, setSettingsOrientation] = useState(checkBreakpoints());
 
   const handleChangeNewName = (event: ChangeEvent) => {
     const target = event.target as unknown as HTMLInputElement; // whyyyyy
@@ -34,6 +60,16 @@ export default function Dashboard () {
   const handleCancelRename = () => {
     setRenaming(false);
     setNewName(dashboard?.name || '');
+  }
+
+  function checkBreakpoints () {
+    if (twoSidebarQuery.matches) {
+      return SettingsPosition.BothSides;
+    } else if (belowQuery.matches) {
+      return SettingsPosition.Below;
+    } else {
+      return SettingsPosition.RightSide;
+    }
   }
 
   const loadDashboard = async () => {
@@ -172,82 +208,140 @@ export default function Dashboard () {
     }
   }
 
+  const renderCanvas = () => {
+    if (!dashboard) return null;
+
+    return (
+      <Box minWidth={`${columns*snapSize}px`}>
+        <LayoutCanvas
+          layout={dashboard.layout}
+          editable={editMode}
+        />
+      </Box>
+    );
+  };
+
+  const renderThemeSettings = () => {
+    if (!dashboard) return null;
+
+    return (
+      <Theme
+        dashboardId={activeDash}
+        dashboard={dashboard}
+        ownerId={ownerId}
+      />
+    );
+
+  };
+
+  const renderLayoutSettings = () => {
+    if (!dashboard) return null;
+
+    return (
+      <>
+        <Box mt={4}>
+          <LayoutGallery
+            onSelect={setSelectedLayoutId}
+            selectedLayoutId={selectedLayoutId}
+          />
+        </Box>
+
+        {selectedLayout && (
+          <Box mt={4}>
+            {/* <h4>LAYOUT PREVIEW</h4>
+            <p>SELECTED LAYOUT #{selectedLayoutId}</p>
+            <p>GRID SIZE: {selectedLayout.gridSize}</p> */}
+            <button onClick={() => applyLayout(selectedLayout.id)}>
+              APPLY SELECTED LAYOUT
+            </button>
+          </Box>
+        )}
+        {dashboard.layout && (
+          <WidgetLibrary
+            layoutId={dashboard.layout.id}
+            onWidgetAdded={loadDashboard}
+          />
+        )}
+      </>
+    );
+  };
+
   const renderContent = () => {
     if (!dashboard) return null;
 
     if (!editMode) {
-      return (
-        <Grid>
-          <GridItem>
-            <LayoutCanvas
-              layout={dashboard.layout}
-              editable={editMode}
-            />
-          </GridItem>
-        </Grid>
-      );
+      return renderCanvas();
     }
 
-    return (
-      <Grid
-        templateRows={{xlDown: "repeat(2, 1fr)", '2xl': "repeat(1, 1fr)"}}
-        templateColumns={{lgDown: "repeat(2, 1fr)", xl: "repeat(2, 1fr)", '2xl': "repeat(3, 1fr)"}}
-      >
-        <GridItem
-          colSpan={{lgDown: 2, xl: 1, '2xl': 1}}
-          rowSpan={{lgDown: 1, xl: 2, '2xl': 1}}
-          order={{xlDown: 1, '2xl': 2}}
-          minWidth={`${19*60}px`}
-        >
-          <LayoutCanvas
-            layout={dashboard.layout}
-            editable={editMode}
-          />
-        </GridItem>
-        <GridItem
-          colSpan={1}
-          rowSpan={1}
-          order={{xlDown: 2, '2xl': 1}}
-          bgColor="black"
-        >
-          <Theme
-            dashboardId={activeDash}
-            dashboard={dashboard}
-            ownerId={ownerId}
-          />
-        </GridItem>
-        <GridItem
-          colSpan={1}
-          rowSpan={1}
-          order={3}
-          bgColor="black"
-        >
-          <Box mt={4}>
-            <LayoutGallery
-              onSelect={setSelectedLayoutId}
-              selectedLayoutId={selectedLayoutId}
-            />
-          </Box>
+    switch (settingsOrientation) {
+      case SettingsPosition.BothSides:
+        return (
+          <Flex height={`${rows*snapSize}px`}>
+            <ScrollArea.Root>
+              <ScrollArea.Viewport>
+                <ScrollArea.Content >
+                  {renderThemeSettings()}
+                </ScrollArea.Content>
+              </ScrollArea.Viewport>
+              <ScrollArea.Scrollbar orientation="vertical" />
+              <ScrollArea.Corner />
+            </ScrollArea.Root>
+            {renderCanvas()}
+            <ScrollArea.Root>
+              <ScrollArea.Viewport>
+                <ScrollArea.Content >
+                  {renderLayoutSettings()}
+                </ScrollArea.Content>
+              </ScrollArea.Viewport>
+              <ScrollArea.Scrollbar orientation="vertical" />
+              <ScrollArea.Corner />
+            </ScrollArea.Root>
+          </Flex>
+        );
+      case SettingsPosition.RightSide:
+        return (
+          <Flex height={`${rows*snapSize}px`}>
+            {renderCanvas()}
+            <ScrollArea.Root>
+              <ScrollArea.Viewport>
+                <ScrollArea.Content >
+                  {renderThemeSettings()}
+                  {renderLayoutSettings()}
+                </ScrollArea.Content>
+              </ScrollArea.Viewport>
+              <ScrollArea.Scrollbar orientation="vertical" />
+              <ScrollArea.Corner />
+            </ScrollArea.Root>
+          </Flex>
 
-          {selectedLayout && (
-            <Box mt={4}>
-              {/* <h4>LAYOUT PREVIEW</h4>
-              <p>SELECTED LAYOUT #{selectedLayoutId}</p>
-              <p>GRID SIZE: {selectedLayout.gridSize}</p> */}
-              <button onClick={() => applyLayout(selectedLayout.id)}>
-                APPLY SELECTED LAYOUT
-              </button>
-            </Box>
-          )}
-          {dashboard.layout && (
-            <WidgetLibrary
-              layoutId={dashboard.layout.id}
-              onWidgetAdded={loadDashboard}
-            />
-          )}
-        </GridItem>
-      </Grid>
-    );
+        );
+      case SettingsPosition.Below:
+        return (
+          <>
+            {renderCanvas()}
+            <Flex>
+              <ScrollArea.Root>
+                <ScrollArea.Viewport>
+                  <ScrollArea.Content >
+                    {renderThemeSettings()}
+                  </ScrollArea.Content>
+                </ScrollArea.Viewport>
+                <ScrollArea.Scrollbar orientation="vertical" />
+                <ScrollArea.Corner />
+              </ScrollArea.Root>
+              <ScrollArea.Root>
+                <ScrollArea.Viewport>
+                  <ScrollArea.Content >
+                    {renderLayoutSettings()}
+                  </ScrollArea.Content>
+                </ScrollArea.Viewport>
+                <ScrollArea.Scrollbar orientation="vertical" />
+                <ScrollArea.Corner />
+              </ScrollArea.Root>
+            </Flex>
+          </>
+        );
+    }
   };
 
   // early return for loading state, guards against null dashboard
