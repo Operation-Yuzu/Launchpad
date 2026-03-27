@@ -7,7 +7,7 @@ import { IoTrashSharp, IoPencilSharp, IoAddCircleOutline, IoPeopleSharp, IoPeopl
 import { UserContext } from './UserContext';
 
 
-function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, ownerId: number}, ownerId: number, dashboardId : number}) {
+function Theme ({dashboard, ownerId, dashboardId, refreshTheme}: {dashboard: { name: string, ownerId: number}, ownerId: number, dashboardId : number, refreshTheme: () => void}) {
   const [themesList, setThemesList] = useState([] as {id: number, navColor: string, bgColor: string, font: string, name: string, public: boolean}[]);
 
   // const [form, setForm] = useState({navColor: 'white', bgColor: 'white', font: 'ariel'});
@@ -21,6 +21,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
   const [editingTheme, setEditingTheme] = useState(false);
   const [publicList, setPublicList] = useState([] as {id: number, navColor: string, bgColor: string, font: string, name: string, public: boolean}[])
   const [page, setPage] = useState(0);
+  const [themeName, setThemeName] = useState('');
   const { setCurrentTheme } = useContext(UserContext);
 
   const allThemes = async () => {
@@ -49,7 +50,8 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
         navColor: navColorPick,
         bgColor: bgColorPick,
         font: fontPick,
-        ownerId: ownerId
+        ownerId: ownerId,
+        name: themeName || 'default'
       })
       allThemes();
     } catch (error) {
@@ -78,6 +80,9 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
     await axios.patch(`/theme/`, {...data, ownerId: ownerId})
     await allThemes()
     await getTheDash()
+    // adding the name to be reset so it does not keep the old name
+    setThemeName('')
+    await refreshTheme();
     }catch (error) {
         console.error(error, 'something went wrong is getTheDash')
       }
@@ -153,6 +158,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
   }
 
   // added a userEffect so that when the user opens the editor the current theme is shown active
+  // can mostly set the colors on load so that the grid matches
   useEffect(() => {
     // if the themesList has content and the dash isnt a demo find and set the current theme
     if(themesList.length > 0 && activeDash.id !== -1){
@@ -160,6 +166,11 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
       // if it does exist then it needs to me the current theme
       if(existing) {
         setCurrTheme(existing)
+        setNavColorPick(existing.navColor)
+        setBgColorPick(existing.bgColor)
+        setFontPick(existing.font)
+        setThemeName(existing.name)
+        setCurrentTheme(existing)
       }
     }
   }, [activeDash.id, themesList.length])
@@ -248,6 +259,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
                 </Box> */}
             </Box>
             <Box display='flex' gap='1' onClick={(e) => e.stopPropagation()}>
+              
                 <Button
                   size='sm' variant='ghost' minW='22px' h='22px' p='0'
                   borderRadius='6px' color='#ffffff'
@@ -368,7 +380,9 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
             setBgColorPick(theme.bgColor)
             setFontPick(theme.font)
             setCurrentTheme(theme)
+            setThemeName(theme.name) // pulling the name out from the card selected
             axios.patch(`/dashboard/${dashboardId}`, { themeId: theme.id })
+              .then(refreshTheme);
             //await getTheDash()
           }}
           _hover={{ transform: 'translateY(-1px)', borderColor: 'rgba(255,255,255,0.18)' }}>
@@ -509,7 +523,27 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
       </Box>
     ))}
   </Box>
-
+        <Box display='flex' alignItems='center' gap='2'
+        py='1.5' borderBottom='0.5px solid rgba(255,255,255,0.06)'>
+        <Text fontSize='11px' color='#ffffff' w='72px' flexShrink={0}>Name</Text>
+        <input
+          value={themeName}
+          onChange={(e) => setThemeName(e.target.value)}
+          maxLength={15}
+          placeholder='default'
+          
+          style={{
+            background: 'transparent',
+            border: '0.5px solid rgba(255,255,255,0.1)',
+            borderRadius: '6px',
+            color: '#ffffff',
+            fontSize: '11px',
+            padding: '4px 8px',
+            width: '100%',
+            outline: 'none',
+          }}
+        />
+      </Box>
   <Box px='2.5' pt='2' pb='2.5'>
     {[
       { label: 'Navigation', value: navColorPick, setter: setNavColorPick },
@@ -542,7 +576,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
         onClick={() => {
           const updateThemeId = currTheme.id !== -1 ? currTheme.id : activeDash.id
           if(updateThemeId !== -1){
-            updateTheme({ id: updateThemeId, navColor: navColorPick, bgColor: bgColorPick, font: fontPick })
+            updateTheme({ id: updateThemeId, navColor: navColorPick, bgColor: bgColorPick, font: fontPick, name: themeName || 'default' })
           }
         }}
       >
