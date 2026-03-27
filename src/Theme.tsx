@@ -157,6 +157,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
   }
 
   // added a userEffect so that when the user opens the editor the current theme is shown active
+  // can mostly set the colors on load so that the grid matches
   useEffect(() => {
     // if the themesList has content and the dash isnt a demo find and set the current theme
     if(themesList.length > 0 && activeDash.id !== -1){
@@ -164,6 +165,11 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
       // if it does exist then it needs to me the current theme
       if(existing) {
         setCurrTheme(existing)
+        setNavColorPick(existing.navColor)
+        setBgColorPick(existing.bgColor)
+        setFontPick(existing.font)
+        setThemeName(existing.name)
+        setCurrentTheme(existing)
       }
     }
   }, [activeDash.id, themesList.length])
@@ -523,6 +529,7 @@ function Theme ({dashboard, ownerId, dashboardId}: {dashboard: { name: string, o
           onChange={(e) => setThemeName(e.target.value)}
           maxLength={15}
           placeholder='default'
+          
           style={{
             background: 'transparent',
             border: '0.5px solid rgba(255,255,255,0.1)',
