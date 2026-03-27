@@ -251,6 +251,14 @@ export default function Dashboard () {
         <Flex align="center" height={nameHeight}>
           <input
           onChange={handleChangeNewName}
+          onKeyDown={(event) => {
+            // https://stackoverflow.com/questions/68979619/how-do-you-submit-on-enter-key-press-in-a-chakra-ui-input
+            if (event.key === 'Enter') {
+              renameDashboard();
+            } else if (event.key === 'Escape') {
+              handleCancelRename();
+            }
+          }}
           value={newName}
           style={{
             color: "black",
@@ -339,6 +347,12 @@ export default function Dashboard () {
 
   // renders the grid containing the layout canvas and the theme and layout panels
   // in a configuration determined by the screen size and edit mode
+  // it is important to ensure that the same instances of the components are rendered
+  // in each configuration to reduce requests.
+  // If each configuration renders its own instances of the settings panel and layout canvas,
+  // then the new canvas renders all new widgets, which each send all of their requests again.
+  // Using the grid allows the configuration to be changed using CSS alone, so it's still the same
+  // component instance and the requests are not resent all over again.
   const renderContent = () => {
     if (!dashboard) return null;
 
