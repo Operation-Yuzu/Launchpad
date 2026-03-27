@@ -292,6 +292,7 @@ export default function Dashboard () {
         <LayoutCanvas
           layout={dashboard.layout}
           editable={editMode}
+          onLayoutChange={loadDashboard}
         />
       </Box>
     );
