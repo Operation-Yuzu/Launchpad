@@ -93,21 +93,27 @@ export default function Dashboard () {
   };
 
   const refreshTheme = async () => {
-    // not a real theme
-    if (themeId === -1) {
-      return;
-    }
+    loadDashboard();
 
-    try {
-      const response = await axios.get(`/theme/${themeId}`);
-      if (!response) {
-        console.error('Failed to refresh theme: no response');
-        return;
-      }
-      setTheme(response.data);
-    } catch (error) {
-      console.error('Failed to refresh theme:', error);
-    }
+    // the following doesn't work because it uses the old themeId
+    // well, maybe it works for editing a theme, but not for changing them
+    // it would be nice to look up the current theme associated with a specific dashboard
+
+    // // not a real theme
+    // if (themeId === -1) {
+    //   return;
+    // }
+
+    // try {
+    //   const response = await axios.get(`/theme/${themeId}`);
+    //   if (!response) {
+    //     console.error('Failed to refresh theme: no response');
+    //     return;
+    //   }
+    //   setTheme(response.data);
+    // } catch (error) {
+    //   console.error('Failed to refresh theme:', error);
+    // }
   };
 
   //Will create a clone of applied layout
@@ -230,6 +236,7 @@ export default function Dashboard () {
         dashboardId={activeDash}
         dashboard={dashboard}
         ownerId={ownerId}
+        refreshTheme={refreshTheme}
       />
     );
 
@@ -429,10 +436,10 @@ export default function Dashboard () {
 
 
   return (
-    <>
+    <Box minH="100vh" bg={theme.bgColor}>
       <NavBar pages={['Home', 'Hub']} textColor={changeTextColor(theme.bgColor)} navColor={theme.navColor}/>
       {/* Use scroll area to make sure content won't exceed horizontal space, to make sure the navbar stays in the correct spot*/}
-      <Box width="full" position="relative" p="0" m="0" bg={theme.bgColor} color="gray.800">
+      <Box width="full" position="relative" p="0" m="0" color="gray.800">
         <ScrollArea.Root width="100%">
           <ScrollArea.Viewport>
             <ScrollArea.Content position="relative">
@@ -449,6 +456,6 @@ export default function Dashboard () {
         </ScrollArea.Root>
         {renderEditButton()}
       </Box>
-    </>
+    </Box>
   );
 }
