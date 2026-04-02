@@ -29,7 +29,6 @@ function Home () {
   }, []);
 
   let navbarLinks: string[];
-  console.log(activeDash);
   if (user.id === -1) {
     navbarLinks = []; // can't go to hub or dashboard if not logged in
   } else {
