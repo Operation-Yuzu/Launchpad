@@ -1,6 +1,6 @@
-import { useState, useEffect, useContext, type ChangeEvent } from 'react';
+import { useState, useEffect, useContext, useCallback, type ChangeEvent } from 'react';
 import axios from 'axios';
-import { AbsoluteCenter, Box, Button, Center, Container, Flex, Grid, GridItem, Heading, Icon, IconButton, ScrollArea, Spinner, VStack } from "@chakra-ui/react";
+import { AbsoluteCenter, Box, Button, Center, Flex, Heading, Icon, IconButton, ScrollArea, VStack } from "@chakra-ui/react";
 import { LuCheck, LuPencil } from "react-icons/lu";
 
 import NavBar from "./NavBar";
@@ -47,6 +47,17 @@ export default function Dashboard () {
   const belowQuery = window.matchMedia(`(width < ${oneSidebarBreakpoint}px)`);
   const twoSidebarQuery = window.matchMedia(`(width >= ${twoSidebarBreakpoint}px)`);
 
+  // checks the media queries to set the correct settings orientation
+  const checkBreakpoints = useCallback(() => {
+    if (twoSidebarQuery.matches) {
+      return SettingsPosition.BothSides;
+    } else if (belowQuery.matches) {
+      return SettingsPosition.Below;
+    } else {
+      return SettingsPosition.RightSide;
+    }
+  }, [twoSidebarQuery, belowQuery]);
+
   /**
    * CONTEXT VARIABLES
    */
@@ -81,24 +92,13 @@ export default function Dashboard () {
   }
 
   // handles changing the settings layout when the screen size crosses a breakpoint
-  const handleMediaChange = () => {
+  const handleMediaChange = useCallback(() => {
     setSettingsOrientation(checkBreakpoints())
-  };
+  }, [checkBreakpoints]);
 
   /**
    * MISCELLANEOUS FUNCTIONS
    */
-
-  // checks the media queries to set the correct settings orientation
-  function checkBreakpoints () {
-    if (twoSidebarQuery.matches) {
-      return SettingsPosition.BothSides;
-    } else if (belowQuery.matches) {
-      return SettingsPosition.Below;
-    } else {
-      return SettingsPosition.RightSide;
-    }
-  }
 
   // loads a dashboard, including its theme
   const loadDashboard = async () => {
