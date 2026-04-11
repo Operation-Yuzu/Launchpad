@@ -1,11 +1,9 @@
-import { useState, useEffect, useContext} from 'react';
+import { useState, useEffect} from 'react';
 import { parseColor } from '@chakra-ui/react'
 import Color from './ColorPicker';
 import axios from 'axios';
 import { Box, Button, Text, Listbox, createListCollection } from "@chakra-ui/react"
 import { IoTrashSharp, IoPencilSharp, IoAddCircleOutline, IoPeopleSharp, IoPeopleOutline } from "react-icons/io5";
-import { UserContext } from './UserContext';
-
 
 function Theme ({dashboard, ownerId, dashboardId, refreshTheme}: {dashboard: { name: string, ownerId: number}, ownerId: number, dashboardId : number, refreshTheme: () => void}) {
   const [themesList, setThemesList] = useState([] as {id: number, navColor: string, bgColor: string, font: string, name: string, public: boolean}[]);
@@ -22,7 +20,6 @@ function Theme ({dashboard, ownerId, dashboardId, refreshTheme}: {dashboard: { n
   const [publicList, setPublicList] = useState([] as {id: number, navColor: string, bgColor: string, font: string, name: string, public: boolean}[])
   const [page, setPage] = useState(0);
   const [themeName, setThemeName] = useState('');
-  const { setCurrentTheme } = useContext(UserContext);
 
   const allThemes = async () => {
     try {
@@ -170,7 +167,6 @@ function Theme ({dashboard, ownerId, dashboardId, refreshTheme}: {dashboard: { n
         setBgColorPick(existing.bgColor)
         setFontPick(existing.font)
         setThemeName(existing.name)
-        setCurrentTheme(existing)
       }
     }
   }, [activeDash.id, themesList.length])
@@ -214,7 +210,6 @@ function Theme ({dashboard, ownerId, dashboardId, refreshTheme}: {dashboard: { n
         //     setNavColorPick(theme.navColor)
         //     setBgColorPick(theme.bgColor)
         //     setFontPick(theme.font)
-        //     setCurrentTheme(theme)
         //     axios.patch(`/dashboard/${dashboardId}`, { themeId: theme.id })
         //     //await getTheDash()
         //   }}
@@ -318,7 +313,6 @@ function Theme ({dashboard, ownerId, dashboardId, refreshTheme}: {dashboard: { n
             setNavColorPick(theme.navColor)
             setBgColorPick(theme.bgColor)
             setFontPick(theme.font)
-            setCurrentTheme(theme)
             await axios.patch(`/dashboard/${dashboardId}`, { themeId: theme.id })
             await getTheDash();
           }}>
@@ -379,7 +373,6 @@ function Theme ({dashboard, ownerId, dashboardId, refreshTheme}: {dashboard: { n
             setNavColorPick(theme.navColor)
             setBgColorPick(theme.bgColor)
             setFontPick(theme.font)
-            setCurrentTheme(theme)
             setThemeName(theme.name) // pulling the name out from the card selected
             axios.patch(`/dashboard/${dashboardId}`, { themeId: theme.id })
               .then(refreshTheme);
