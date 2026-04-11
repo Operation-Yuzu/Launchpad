@@ -12,7 +12,7 @@ const snapSize = 60;
 
 
 
-const LayoutCanvas = function({layout, editable=false, onLayoutChange}: { layout: Layout; editable?: boolean; onLayoutChange?: () => void; }){
+const LayoutCanvas = function({layout, editable=false, widgetTextColor = "white", onLayoutChange}: { layout: Layout; editable?: boolean; widgetTextColor?: string; onLayoutChange?: () => void; }){
 
   const handleResize = async ( elementId: number, posX: number, posY: number, sizeX: number, sizeY: number) => {
   try{
@@ -80,6 +80,7 @@ const LayoutCanvas = function({layout, editable=false, onLayoutChange}: { layout
           <WidgetComp
             widgetId={element.id}
             settings={element.settings}
+            textColor={widgetTextColor}
           />
         </WidgetFrame>
         )

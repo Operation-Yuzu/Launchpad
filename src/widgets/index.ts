@@ -6,7 +6,7 @@ import AiChat from './AiChat';
 
 import type { WidgetSettings } from '../../types/LayoutTypes';
 
-const WidgetMap: Record<string, { id: number, name: string, component: React.FC<{widgetId: number, settings: WidgetSettings | null}> }>= {
+const WidgetMap: Record<string, { id: number, name: string, component: React.FC<{widgetId: number, textColor: string, settings: WidgetSettings | null}> }>= {
   1: {id: 1, name: 'Calendar', component: Calendar},
   2: {id: 2, name: 'Email', component: Email},
   3: {id: 3, name: 'Timer', component: Timer},
