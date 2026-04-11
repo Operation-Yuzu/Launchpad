@@ -22,6 +22,7 @@ import { UserContext } from "./UserContext";
 import NavBar from "./NavBar";
 import Notifications from "./Notifications";
 import Accounts from "./Accounts";
+import ColorblindFilterBox from './ColorblindFilter';
 
 type ScheduleDraft = {
   id: string; // backend schedule.id once saved, temporary UUID before saving
@@ -92,6 +93,7 @@ export default function Hub(
       const res = await axios.get(`/schedule/${ownerId}`)
       console.log(res)
       setSchedules(res.data)
+      if (res.data.length > 0) setMode("CUSTOM");
     } catch (error) {
       console.error("There was a problem getting user's scheduled dashboards", error);
     }
@@ -153,13 +155,13 @@ export default function Hub(
    */
   const handleSetDefault = async (dashboardId: number) => {
     try {
-      // change primary dashboard for user in 
-      await axios.patch(`/dashboard/primary/${ownerId}`, { primaryDashId: dashboardId });
-      // delete any existing scheduled dashboard changes
+      await axios.patch(`/dashboard/primary/${ownerId}`, {
+        primaryDashId: dashboardId,
+      });
       await axios.delete(`/schedule/all/${ownerId}`);
-      // refresh dashboard data
       getDashboardData();
-      // reset edit status
+      await getScheduledDashboardsData();
+      setMode("ALWAYS");
       setEditingAlways(false);
     } catch (err) {
       console.error(err);
@@ -220,10 +222,19 @@ export default function Hub(
     navigate("/dashboard", { replace: true })
   };
 
+  // early return - don't render most of the hub elements if user is not logged in to prevent a flash before the redirect
+  // still render the navbar though
+  if (ownerId === -1) {
+    return (
+      <Box width="full" minH="100vh" position="relative" p="0" m="0">
+        <NavBar pages={[]} navColor="#dba022" />
+      </Box>
+    )
+  }
 
   return (
     <>
-      <NavBar pages={["Home", "Dashboard"]} navColor="#dba022"/>{" "}
+      <NavBar pages={["Home", "Dashboard"]} navColor="#dba022" />{" "}
       {/*empty string will take user to Home page*/}
       <Flex minH="100vh" justify="center">
         <Box w="100%" maxW="1800px" p={6}>
@@ -249,6 +260,7 @@ export default function Hub(
               borderColor="gray.600"
               borderRadius="lg"
               p={4}
+              className="glass-hub-box"
             >
               <HStack justify="space-between" mb={3}>
                 <Text fontWeight="bold">Primary Dashboard Schedule</Text>
@@ -293,7 +305,7 @@ export default function Hub(
                     }
                   }}
                 >
-                  <option value="ALWAYS">Always</option>
+                  <option value="ALWAYS">Default</option>
                   <option value="CUSTOM">Scheduled Dashboards</option>
                 </NativeSelect.Field>
                 <NativeSelect.Indicator />
@@ -350,7 +362,14 @@ export default function Hub(
                   {schedules.map((s) => (
                     <HStack key={`saved-${s.id}`} gap={3} align="center">
                       <Box flex="1">
-                        <Text minW="90px">{s.time}</Text>
+                        <Text minW="90px">
+                          {(() => {
+                            const [h, m] = s.time.split(":").map(Number);
+                            const period = h >= 12 ? "PM" : "AM";
+                            const hour = h % 12 || 12;
+                            return `${hour}:${String(m).padStart(2, "0")} ${period}`;
+                          })()}
+                        </Text>
                       </Box>
                       <Box flex="1">
                         <Text>{s.dashboard?.name}</Text>
@@ -473,6 +492,7 @@ export default function Hub(
               p={4}
               h="280px"
               overflowY="auto"
+              className="glass-hub-box"
             >
               <Text fontWeight="bold" mb={3}>
                 Notifications
@@ -499,12 +519,14 @@ export default function Hub(
               p={4}
               h="280px"
               overflowY="auto"
+              className="glass-hub-box"
             >
               <Text fontWeight="bold" mb={3}>
                 Connected Accounts
               </Text>
               <Accounts />
             </Box>
+          {/* <ColorblindFilterBox /> */}
           </HStack>
           {/* Dashboards */}
           <Box
@@ -514,6 +536,7 @@ export default function Hub(
             p={4}
             mb={6}
             overflowY="auto"
+            className="glass-hub-box"
           >
             <Text fontWeight="bold" mb={3}>
               Dashboards

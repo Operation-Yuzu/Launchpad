@@ -61,9 +61,25 @@ const LayoutCanvas = function({layout, editable=false, onLayoutChange}: { layout
           return null;
         }
 
-        return (
-          <WidgetFrame
-            key={element.id}
+      return (
+        <WidgetFrame
+        key={element.id}
+        widgetId={element.id}
+        posX ={element.posX}
+        posY={element.posY}
+        sizeX={element.sizeX}
+        sizeY={element.sizeY}
+        minWidth={1}
+        minHeight={1}
+        boundingWidth={gridCols}
+        boundingHeight={gridRows}
+        color='#e5e7eb'
+        snapSize={snapSize}
+        handleResizeOrMove={handleResize}
+        onDelete={handleDelete}
+        editActive={editable}
+        >
+          <WidgetComp
             widgetId={element.id}
             posX={element.posX}
             posY={element.posY}
