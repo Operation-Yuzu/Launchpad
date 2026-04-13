@@ -157,7 +157,7 @@ layout.post('/:layoutId/copy', async (req, res) => {
     //create private copy of layout
     const newLayout = await prisma.layout.create({
       data: {
-        ownerId: req.user.id,
+        ownerId: userId,
         public: false,
         gridSize: sourceLayout.gridSize
       }
