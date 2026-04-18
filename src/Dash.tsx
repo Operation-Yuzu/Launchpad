@@ -326,6 +326,7 @@ export default function Dashboard () {
           <LayoutGallery
             onSelect={setSelectedLayoutId}
             selectedLayoutId={selectedLayoutId}
+            currentLayoutId={dashboard.layout.id}
           />
         </Box>
 
