@@ -7,9 +7,9 @@
 .liquid-glass-card {
   position: absolute;
   /* overflow must be visible so edge handles are not clipped */
-  overflow: visible;
+  overflow: hidden;
   border-radius: 20px;
-
+  isolation: isolate;
   /* Tint layer — overridden via inline CSS variable */
   --glass-tint: rgba(255, 255, 255, 0);
   background-color: var(--glass-tint);
