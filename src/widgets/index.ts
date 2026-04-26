@@ -1,6 +1,6 @@
 
 import type { IconType } from "react-icons";
-import { LuBot, LuCalendarDays, LuMail, LuTimer, LuLink} from "react-icons/lu";
+import { LuBot, LuCalendarDays, LuMail, LuTimer, LuLink, LuMusic} from "react-icons/lu";
 
 
 import Calendar from './Calendar';
@@ -8,6 +8,7 @@ import Email from './Email';
 import Link from './Link';
 import Timer from './Timer';
 import AiChat from './AiChat';
+import Music from './Music';
 
 import type { WidgetSettings } from '../../types/LayoutTypes';
 
@@ -25,6 +26,7 @@ const WidgetMap: Record<number, WidgetDefinition>= {
   3: {id: 3, name: 'Timer', component: Timer, icon: LuTimer},
   4: {id: 4, name: 'Link', component: Link, icon: LuLink},
   5: { id: 5, name: 'AI Chat',  component: AiChat, icon: LuBot },
+  6: { id: 6, name: 'Music', component: Music, icon: LuMusic },
 };
 
 export default WidgetMap;

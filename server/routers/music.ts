@@ -26,7 +26,7 @@ spotify.get('/login', (req, res) => {
     response_type: 'code',
     client_id: spotify_client_id!,
     scope: scope,
-    redirect_uri: 'http://127.0.0.1:3000/auth/callback',
+    redirect_uri: 'http://127.0.0.1:8000/spotify/callback',
     state: state,
   });
 
@@ -40,7 +40,7 @@ spotify.get('/callback', (req, res) => {
     url: 'https://accounts.spotify.com/api/token',
     form: {
       code: code,
-      redirect_uri: 'http://127.0.0.1:3000/auth/callback',
+      redirect_uri: 'http://127.0.0.1:8000/spotify/callback',
       grant_type: 'authorization_code',
     },
     headers: {
@@ -50,7 +50,7 @@ spotify.get('/callback', (req, res) => {
     json: true,
   };
 
-  request.post(authOptions, function (error, response, body) {
+  request.post(authOptions, function (error: any, response: any, body: any) {
     if (!error && response.statusCode === 200) {
       access_token = body.access_token;
       res.redirect('/');
