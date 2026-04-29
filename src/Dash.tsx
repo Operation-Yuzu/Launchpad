@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext, useCallback, type ChangeEvent } from 'react';
 import axios from 'axios';
-import { AbsoluteCenter, Box, Button, Center, Drawer, Flex, Heading, Icon, IconButton, ScrollArea, VStack } from "@chakra-ui/react";
-import { LuCheck, LuPencil } from "react-icons/lu";
+import { AbsoluteCenter, Box, Button, Center, CloseButton, Drawer, Flex, Heading, Icon, IconButton, Input, ScrollArea, VStack } from "@chakra-ui/react";
+import { LuCheck, LuPencil, LuSettings } from "react-icons/lu";
 
 import NavBar from "./NavBar";
 import Theme from './Theme';
@@ -72,9 +72,17 @@ export default function Dashboard () {
   const [theme, setTheme] = useState({} as ThemeObject);
   const [newName, setNewName] = useState('');
   const [renaming, setRenaming] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedLayoutId, setSelectedLayoutId] = useState(-1);//(-1 = nothing selected)
   const [selectedLayout, setSelectedLayout] = useState<Layout | null>(null);
   const [settingsOrientation, setSettingsOrientation] = useState(checkBreakpoints());
+
+  /**
+   * LOCAL VARIABLES con't (these depend on the theme state variable)
+   */
+
+  const buttonBackground = theme.bgColor ? changeTextColor(theme.bgColor, 'black', 'white') : 'white';
+  const buttonTextColor = theme.bgColor ? changeTextColor(theme.bgColor, 'white', 'black') : 'black';
 
   /**
    * EVENT HANDLERS
@@ -94,6 +102,7 @@ export default function Dashboard () {
 
   // handles changing the settings layout when the screen size crosses a breakpoint
   const handleMediaChange = useCallback(() => {
+    setDrawerOpen(false); // drawer will never start open
     setSettingsOrientation(checkBreakpoints())
   }, [checkBreakpoints]);
 
@@ -227,7 +236,7 @@ export default function Dashboard () {
   // renders the edit/done button in the top right corner
   const renderEditButton = () => {
     return (
-      <IconButton onClick={() => setEditMode(e => !e)} position="absolute" right="20px" top="20px">
+      <IconButton onClick={() => setEditMode(e => !e)} position="absolute" right="20px" top="20px" bgColor={buttonBackground} color={buttonTextColor} >
         {editMode ? <LuCheck /> : <LuPencil />}
       </IconButton>
     );
@@ -249,34 +258,32 @@ export default function Dashboard () {
 
     if (renaming) {
       return (
-        <Flex align="center" height={nameHeight} color={changeTextColor(theme.bgColor)}>
-          <input
-          onChange={handleChangeNewName}
-          onKeyDown={(event) => {
-            // https://stackoverflow.com/questions/68979619/how-do-you-submit-on-enter-key-press-in-a-chakra-ui-input
-            if (event.key === 'Enter') {
-              renameDashboard();
-            } else if (event.key === 'Escape') {
-              handleCancelRename();
-            }
-          }}
-          value={newName}
-          style={{
-            color: "black",
-            backgroundColor: "white",
-            border: "1px solid #82de11",
-            padding: "4px"
-          }}
+        <Flex align="center" height={nameHeight} color={changeTextColor(theme.bgColor)} gap="0.5rem">
+          <Input
+            onChange={handleChangeNewName}
+            onKeyDown={(event) => {
+              // https://stackoverflow.com/questions/68979619/how-do-you-submit-on-enter-key-press-in-a-chakra-ui-input
+              if (event.key === 'Enter') {
+                renameDashboard();
+              } else if (event.key === 'Escape') {
+                handleCancelRename();
+              }
+            }}
+            value={newName}
+            size="xs"
+            id='nameInput'
+            borderColor={changeTextColor(theme.bgColor ?? '#000000', 'gray.950', 'gray.50')}
+            focusRingColor={changeTextColor(theme.bgColor ?? '#000000', 'gray.950', 'gray.50')}
           />
-          <Button onClick={renameDashboard}>Save</Button>
-          <Button onClick={handleCancelRename}>Cancel</Button>
+          <Button onClick={renameDashboard} size="xs" bgColor={buttonBackground} color={buttonTextColor}>Save</Button>
+          <Button onClick={handleCancelRename} size="xs" bgColor={buttonBackground} color={buttonTextColor}>Cancel</Button>
         </Flex>
       );
     } else {
       return (
         <Flex align="center" onClick={() => setRenaming(true)} height={nameHeight} color={changeTextColor(theme.bgColor)}>
           <Heading >{dashboard.name}</Heading>
-          <Icon>
+          <Icon ml="0.5rem">
             <LuPencil />
           </Icon>
         </Flex>
@@ -301,15 +308,17 @@ export default function Dashboard () {
   };
 
   // renders the theme settings (theme library, theme editor, etc)
-  const renderThemeSettings = () => {
+  const renderThemeSettings = (overrideBgColor?: string) => {
     if (!dashboard) return null;
+
+    const localBgColor = overrideBgColor ?? theme.bgColor;
 
     return (
       <Theme
         dashboardId={activeDash}
         dashboard={dashboard}
         ownerId={ownerId}
-        textColor={changeTextColor(theme.bgColor)}
+        textColor={changeTextColor(localBgColor)}
         refreshTheme={refreshTheme}
       />
     );
@@ -317,12 +326,15 @@ export default function Dashboard () {
   };
 
   // renders the layout settings (public layouts, widget library, etc)
-  const renderLayoutSettings = () => {
+  const renderLayoutSettings = (overrideBgColor?: string) => {
     if (!dashboard) return null;
+
+    const localBgColor = overrideBgColor ?? theme.bgColor;
+    const textColor = changeTextColor(localBgColor);
 
     return (
       <>
-        <Box mt={4} color={changeTextColor(theme.bgColor)}>
+        <Box mt={4} color={textColor}>
           <LayoutGallery
             onSelect={setSelectedLayoutId}
             selectedLayoutId={selectedLayoutId}
@@ -331,7 +343,7 @@ export default function Dashboard () {
         </Box>
 
         {selectedLayout && (
-          <Box mt={4} color={changeTextColor(theme.bgColor)}>
+          <Box mt={4} color={textColor}>
             {/* <h4>LAYOUT PREVIEW</h4>
             <p>SELECTED LAYOUT #{selectedLayoutId}</p>
             <p>GRID SIZE: {selectedLayout.gridSize}</p> */}
@@ -343,7 +355,7 @@ export default function Dashboard () {
         {dashboard.layout && (
           <WidgetLibrary
             layoutId={dashboard.layout.id}
-            textColor={changeTextColor(theme.bgColor)}
+            textColor={textColor}
             onWidgetAdded={loadDashboard}
           />
         )}
@@ -357,20 +369,38 @@ export default function Dashboard () {
     }
 
     return (
-      <Drawer.Root closeOnInteractOutside={false} size="sm">
-        <Drawer.Trigger position="absolute" right="20px" top="60px">
-          Open
+      <Drawer.Root
+        size="sm"
+        open={drawerOpen}
+        onOpenChange={(e) => setDrawerOpen(e.open)}
+        modal={false}
+        closeOnInteractOutside={false}
+        trapFocus={false}
+        preventScroll={false}
+        closeOnEscape={false}
+        onEscapeKeyDown={() => {
+          if (!renaming || document.activeElement !== document.getElementById('nameInput')) {
+            // if cancelling editing the name, don't also close the settings drawer
+            setDrawerOpen(false);
+          }
+        }}
+      >
+        <Drawer.Trigger position="absolute" right="20px" top="64px" asChild>
+          <IconButton bgColor={buttonBackground} color={buttonTextColor}>
+            <LuSettings />
+          </IconButton>
         </Drawer.Trigger>
-        <Drawer.Positioner>
+        <Drawer.Positioner pointerEvents={"none"}>
           <Drawer.Content p={4}>
-            <Drawer.CloseTrigger>
-              Close
+            <Drawer.CloseTrigger asChild>
+              <CloseButton size='sm'/>
             </Drawer.CloseTrigger>
-            <ScrollArea.Root>
+            <ScrollArea.Root mt="32px">
               <ScrollArea.Viewport>
                 <ScrollArea.Content >
-                  {renderThemeSettings()}
-                  {renderLayoutSettings()}
+                  {/** use dark theme drawer color instead of theme background color. Hardcoded values work because dark theme is forced */}
+                  {renderThemeSettings('#111111')}
+                  {renderLayoutSettings('#111111')}
                 </ScrollArea.Content>
               </ScrollArea.Viewport>
               <ScrollArea.Scrollbar orientation="vertical" />
